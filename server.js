@@ -7,8 +7,6 @@ const server = express();
 const http = require("http").Server(server);
 const io = require("socket.io")(http);
 
-const db = require("./models");
-
 require("dotenv").config();
 
 server.use(cors());
@@ -39,15 +37,9 @@ server.use(expressWinston.errorLogger({
   )
 }));
 
-db.sequelize.sync().then(() => {
-  console.log("Connection has been established successfully.");
-}).catch(err => {
-  console.error("Unable to connect to the database:", err);
-});
-
 let port = process.env.PORT;
 if (port == null || port === "") {
-  port = 3000;
+  port = 8080;
 }
 
 const listen = http.listen(port, () => {
