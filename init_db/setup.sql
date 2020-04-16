@@ -1,4 +1,7 @@
 /***CREATING ALL TABLES*/
+USE mydb;
+GRANT ALL PRIVILEGES ON mydb.* TO 'user'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON mydb.* TO 'user'@'localhost' IDENTIFIED BY 'password';
 CREATE TABLE EMPLOYEE (
   EmployeeId   INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
   FirstName    VARCHAR(40)                    NULL,

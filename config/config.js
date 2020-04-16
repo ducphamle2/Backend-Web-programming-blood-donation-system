@@ -1,9 +1,9 @@
 module.exports = {
   development: {
     host: process.env.DATABASE_HOST || 'mysql', // it should be 'mysql' not 'localhost' !!!!!!
-    user: 'root',
+    user: 'user',
     password: 'password',
-    database: 'db',
+    database: 'mydb',
     port: process.env.DATABASE_PORT || 3306
   },
   production: {
