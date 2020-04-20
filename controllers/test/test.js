@@ -2,7 +2,7 @@ var db = require('../../database/index')
 
 module.exports = {
   test: (req, res) => {
-    db.query("SELECT * from mydb.EMPLOYEE", function (err, result) {
+    db.query("SELECT * from mydb.donor", function (err, result) {
       if (err) {
         return res.status(400).json({
           message: "Error connecting to database" + err,

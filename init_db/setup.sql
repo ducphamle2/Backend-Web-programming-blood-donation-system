@@ -1,4 +1,5 @@
 /***CREATING ALL TABLES*/
+create database mydb;
 USE mydb;
 GRANT ALL PRIVILEGES ON mydb.* TO 'user'@'%' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON mydb.* TO 'user'@'localhost' IDENTIFIED BY 'password';
@@ -14,6 +15,23 @@ CREATE TABLE EMPLOYEE (
   Pin          VARCHAR(100)                   NULL,
   CreationDate DATETIME                       NULL,
   EmployeeCode VARCHAR(10) UNIQUE             NOT NULL
+)
+  ENGINE = INNODB;
+
+CREATE TABLE ABCD (
+  ABCD         INT PRIMARY KEY                NOT NULL,
+  FirstName    VARCHAR(40)                    NULL,
+  LastName     VARCHAR(40)                    NULL,
+  Phone        VARCHAR(20)                    NULL,
+  Address      VARCHAR(100)                   NULL,
+  City         VARCHAR(30)                    NULL,
+  FullName     VARCHAR(100)                   NULL,
+  Email        VARCHAR(100)                   NULL,
+  Pin          VARCHAR(100)                   NULL,
+  CreationDate DATETIME                       NULL,
+  EmployeeCode VARCHAR(10) UNIQUE             NOT NULL,
+  EmployeeId   INT UNIQUE NOT NULL,
+  FOREIGN KEY (EmployeeId) REFERENCES EMPLOYEE(EmployeeId)
 )
   ENGINE = INNODB;
 
