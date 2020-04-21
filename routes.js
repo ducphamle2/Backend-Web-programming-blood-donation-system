@@ -1,6 +1,8 @@
 module.exports = (server) => {
   server.use("/api/auth/", require("./controllers/auth/index.js"));
 
+  server.use("/api/", require("./controllers/blood_event/index.js"));
+
   //server.use("/api/", require("./controllers/test/index.js"));
 
   server.use("*", (req, res) => {
