@@ -34,7 +34,7 @@ module.exports = {
       let sql = 'SELECT * from ?? where email = ?'
       db.query(sql, [role, email], async function (err, user) {
         if (err) {
-          return res.status(400).json({
+          res.status(400).json({
             message: "Error connecting to database" + err,
           });
         }
@@ -77,12 +77,21 @@ module.exports = {
       // hash the password for protection in case db is exposed
       let password = generateHash(req.body.password)
       console.log("Password: ", password)
-      let values = [
-        // insert into three values, id which is 32 characters, email and password
-        [crypto.randomBytes(16).toString("hex"), req.body.email, password]
-      ]
+      let values =
+        req.body.role === "hospital" ?
+          [
+            // insert into three values, id which is 32 characters, email and password
+            [crypto.randomBytes(16).toString("hex"), req.body.redcross_id, req.body.email, password]
+          ] :
+          [
+            // insert into three values, id which is 32 characters, email and password
+            [crypto.randomBytes(16).toString("hex"), req.body.email, password]
+          ]
       // role id is used to distinguish from tables
-      let sql = 'insert into ?? (' + req.body.role_id + ', email, password) values ?'
+      let sql =
+        req.body.role === "hospital" ?
+          'insert into ?? (' + req.body.role_id + ', redcross_id, email, password) values ?' :
+          'insert into ?? (' + req.body.role_id + ', email, password) values ?'
       db.query(sql, [req.body.role, values], function (err, user) {
         if (err) {
           res.status(400).json({
@@ -98,3 +107,4 @@ module.exports = {
     }
   }
 };
+
