@@ -126,8 +126,7 @@ module.exports = {
             } else {
               console.log("USER: ", user)
               res.status(200).json({
-                message: "Registered successfully",
-                body: password
+                message: "Registered successfully"
               });
             }
           })
