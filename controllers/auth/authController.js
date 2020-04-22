@@ -6,6 +6,7 @@ const { validationResult } = require("express-validator/check");
 const db = require("../../database/index");
 const userId = require("../../utils/utils").generateId
 const constants = require("../../utils/constants")
+const checkRole = require("../../utils/utils").checkRole
 
 const generateHash = (password) => {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
@@ -29,6 +30,9 @@ module.exports = {
       logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ errors: errors.array() });
     } else {
+      if (!checkRole(req.body.role)) {
+        return res.status(400).json({ message: "Wrong role when login" })
+      }
       let email = req.body.email
       let role = req.body.role
       // role is used to select from correct table. Client will send the role
@@ -40,7 +44,7 @@ module.exports = {
             message: "Error querying" + err,
           });
         } else if (user.length === 0) {
-          return res.status(404).json({
+          return res.status(204).json({
             message: "Cannot find the correct user"
           })
         } else {
@@ -86,6 +90,10 @@ module.exports = {
       logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ errors: errors.array() });
     } else {
+      // if it's not among four roles then return error
+      if (!checkRole(req.body.role)) {
+        return res.status(400).json({ message: "Wrong role when registering" })
+      }
       // hash the password for protection in case db is exposed
       let password = generateHash(req.body.password)
       let sql = "select name, email from ?? where name = ? or email = ?"

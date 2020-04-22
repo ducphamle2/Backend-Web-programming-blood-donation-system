@@ -61,8 +61,8 @@ CREATE TABLE blood_store (
 
 CREATE TABLE notification (
   notification_id       CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  red_cross_id          CHAR(32) UNIQUE               NOT NULL,  
-  organizer_id          CHAR(32) UNIQUE               NOT NULL, 
+  red_cross_id          CHAR(32)                      NOT NULL,  
+  organizer_id          CHAR(32)                      NOT NULL, 
   noti_date             DATETIME                      NULL, 
   content               VARCHAR(50)                   NULL,
   FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id),
@@ -73,11 +73,11 @@ CREATE TABLE notification (
 
 CREATE TABLE event (
   event_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  red_cross_id          CHAR(32) UNIQUE               NOT NULL, 
-  organizer_id          CHAR(32) UNIQUE               NOT NULL, 
+  red_cross_id          CHAR(32)                      NOT NULL, 
+  organizer_id          CHAR(32)                      NOT NULL, 
   event_date            DATETIME                      NOT NULL, 
   name                  VARCHAR(99)                   NOT NULL, 
-  location              VARCHAR(50)                   NOT NULL, 
+  location              VARCHAR(99)                   NOT NULL, 
   status                VARCHAR(10)                   NOT NULL,
   FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id),
   FOREIGN KEY (organizer_id) REFERENCES organizer(organizer_id)
@@ -87,9 +87,9 @@ CREATE TABLE event (
 
 CREATE TABLE blood (
   blood_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  red_cross_id          CHAR(32) UNIQUE               NOT NULL,  
-  event_id              CHAR(32) UNIQUE               NOT NULL, 
-  donor_id              CHAR(32) UNIQUE               NOT NULL, 
+  red_cross_id          CHAR(32)                      NOT NULL,  
+  event_id              CHAR(32)                      NOT NULL, 
+  donor_id              CHAR(32)                      NOT NULL, 
   donate_date           DATETIME                      NULL, 
   amount                DOUBLE PRECISION              NULL, 
   status                VARCHAR(10)                   NULL,
