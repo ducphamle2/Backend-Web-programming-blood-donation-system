@@ -89,7 +89,7 @@ module.exports = {
       return res.status(422).json({ errors: errors.array() });
     } else {
       let sql = "delete from event where event_id = ?"
-      let values = [[req.body.id]]
+      let values = [[req.params.id]]
       db.query(sql, [values], function (err, result) {
         console.log("result: ", result)
         if (err) {
@@ -106,11 +106,10 @@ module.exports = {
   searchEventWithName: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ error: errors.array() });
     } else {
       let sql = "select * from event where name = ?"
-      let values = [[req.body.name]]
+      let values = [[req.query.name]]
       db.query(sql, [values], function (err, result) {
         if (err) {
           return res.status(500).json({
@@ -147,4 +146,13 @@ module.exports = {
       })
     }
   },
+  getAllEvents: (req, res) => {
+    db.query("select * from event", function (err, result) {
+      if (err) {
+        return res.status(500).json({ error: "there is something wrong with the database" })
+      } else {
+        return res.status(200).json({ message: "success", data: result })
+      }
+    })
+  }
 };

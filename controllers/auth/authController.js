@@ -87,7 +87,6 @@ module.exports = {
   register: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ error: errors.array() });
     } else {
       // if it's not among four roles then return error

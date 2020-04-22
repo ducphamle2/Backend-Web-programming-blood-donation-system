@@ -17,13 +17,15 @@ router.post("/create_event", authMiddleware, [
 
 router.post("/update_event", authMiddleware, controller.updateEvent);
 
-router.delete("/delete_event", check("id").isLength({ min: 32, max: 32 }), authMiddleware, controller.deleteEvent);
+router.delete("/delete_event/:id", check("id").isLength({ min: 32, max: 32 }), authMiddleware, controller.deleteEvent);
 
-router.post("/search_with_name",
+router.get("/search_with_name",
   check("name").isLength({ min: 3, max: 99 })
-  , authMiddleware, controller.searchEventWithName);
+  , controller.searchEventWithName);
 
 router.post("/search_with_date", check("date").
-  matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"), authMiddleware, controller.searchEventWithDate);
+  matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"), controller.searchEventWithDate);
+
+router.get("/get_events", controller.getAllEvents)
 
 module.exports = router;
