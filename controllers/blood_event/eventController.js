@@ -36,11 +36,11 @@ module.exports = {
             let values = [[req.body.name]]
             db.query(sql, [values], function (err, result) {
               if (result.length > 0) {
-                return res.status(403).json({
+                return res.status(409).json({
                   message: "This event has been created already !!",
                 });
               } else if (err) {
-                return res.status(400).json({
+                return res.status(500).json({
                   message: "There is something wrong when querying",
                 });
               } else {
@@ -84,20 +84,37 @@ module.exports = {
 
   },
   deleteEvent: (req, res) => {
-
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    } else {
+      let sql = "delete from event where event_id = ?"
+      let values = [[req.body.id]]
+      db.query(sql, [values], function (err, result) {
+        console.log("result: ", result)
+        if (err) {
+          return res.status(500).json({ error: "There is something wrong with the database" })
+          // if the deletion affects no rows then cannot find the given event id
+        } else if (result.affectedRows === 0) {
+          return res.status(404).json({ error: "Error cannot find the given event id" })
+        } else {
+          return res.status(200).json({ message: "Delete the event successfully" })
+        }
+      })
+    }
   },
   searchEventWithName: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
-      return res.status(422).json({ errors: errors.array() });
+      return res.status(422).json({ error: errors.array() });
     } else {
       let sql = "select * from event where name = ?"
       let values = [[req.body.name]]
       db.query(sql, [values], function (err, result) {
         if (err) {
-          return res.status(400).json({
-            message: "Error querying: " + err,
+          return res.status(500).json({
+            error: "Error querying: " + err,
           });
         } else {
           return res.status(200).json({
@@ -117,8 +134,8 @@ module.exports = {
       let values = [[req.body.date]]
       db.query(sql, [values], function (err, result) {
         if (err) {
-          return res.status(400).json({
-            message: "Error querying: " + err,
+          return res.status(500).json({
+            error: "Error querying: " + err,
           });
         } else {
           // Apply each element to the Date function

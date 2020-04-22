@@ -28,10 +28,10 @@ module.exports = {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
-      return res.status(422).json({ errors: errors.array() });
+      return res.status(422).json({ error: errors.array() });
     } else {
       if (!checkRole(req.body.role)) {
-        return res.status(400).json({ message: "Wrong role when login" })
+        return res.status(400).json({ error: "Wrong role when login" })
       }
       let email = req.body.email
       let role = req.body.role
@@ -40,8 +40,8 @@ module.exports = {
       db.query(sql, [role, email], async function (err, user) {
         console.log("user: ", user)
         if (err) {
-          return res.status(400).json({
-            message: "Error querying" + err,
+          return res.status(500).json({
+            error: "Error querying" + err,
           });
         } else if (user.length === 0) {
           return res.status(204).json({
@@ -51,7 +51,7 @@ module.exports = {
           let result = await bcrypt.compare(req.body.password, user[0].password)
           if (!result || result.length === 0) {
             res.status(422).json({
-              message: "Auth failed!"
+              error: "Auth failed!"
             });
             logger.info("Wrong password");
           } else {
@@ -68,7 +68,7 @@ module.exports = {
             }, process.env.SECRET_KEY, { algorithm: "HS512" }, (err, token) => {
               if (err) {
                 return res.status(422).json({
-                  message: "Auth failed",
+                  error: "Auth failed",
                 });
               } else {
                 return res.status(200).json({
@@ -88,11 +88,11 @@ module.exports = {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
-      return res.status(422).json({ errors: errors.array() });
+      return res.status(422).json({ error: errors.array() });
     } else {
       // if it's not among four roles then return error
       if (!checkRole(req.body.role)) {
-        return res.status(400).json({ message: "Wrong role when registering" })
+        return res.status(400).json({ error: "Wrong role when registering" })
       }
       // hash the password for protection in case db is exposed
       let password = generateHash(req.body.password)
@@ -102,12 +102,12 @@ module.exports = {
         // if the name has been used then we return error
         console.log("result: ", result)
         if (result === undefined || result.length > 0) {
-          return res.status(403).json({
-            message: "The name or email has already been used",
+          return res.status(409).json({
+            error: "The name or email has already been used",
           });
         } else if (err) {
-          return res.status(400).json({
-            message: "There is something wrong when querying: " + err,
+          return res.status(500).json({
+            error: "There is something wrong when querying: " + err,
           });
         } else {
           let values =
@@ -128,8 +128,8 @@ module.exports = {
               'insert into ?? (' + role_id + ', email, password, name) values ?'
           db.query(sql, [req.body.role, values], function (err, user) {
             if (err) {
-              return res.status(400).json({
-                message: "Error querying: " + err,
+              return res.status(500).json({
+                error: "Error querying: " + err,
               });
             } else {
               console.log("USER: ", user)

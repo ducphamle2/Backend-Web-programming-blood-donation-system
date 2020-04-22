@@ -17,7 +17,7 @@ router.post("/create_event", authMiddleware, [
 
 router.post("/update_event", authMiddleware, controller.updateEvent);
 
-router.post("/delete_event", authMiddleware, controller.deleteEvent);
+router.delete("/delete_event", check("id").isLength({ min: 32, max: 32 }), authMiddleware, controller.deleteEvent);
 
 router.post("/search_with_name",
   check("name").isLength({ min: 3, max: 99 })
