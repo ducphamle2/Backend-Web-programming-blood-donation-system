@@ -13,7 +13,7 @@ module.exports = {
       // only organizer can create event
       if (req.userData.role !== "organizer") {
         return res.status(403).json({
-          message: "Forbidden !! You are not allowed to call this function"
+          error: "Forbidden !! You are not allowed to call this function"
         })
       } else {
         // need to find the id of the red cross since user can only remember name 
@@ -22,11 +22,11 @@ module.exports = {
         db.query(sql, [values], function (err, result) {
           if (result.length === 0) {
             return res.status(404).json({
-              message: "Cannot find the red cross name",
+              error: "Cannot find the red cross name",
             });
           } else if (err) {
-            return res.status(400).json({
-              message: "There is something wrong when querying",
+            return res.status(500).json({
+              error: "There is something wrong when querying",
             });
           } else {
             let red_cross_id = result[0].red_cross_id
@@ -37,16 +37,15 @@ module.exports = {
             db.query(sql, [values], function (err, result) {
               if (result.length > 0) {
                 return res.status(409).json({
-                  message: "This event has been created already !!",
+                  error: "This event has been created already !!",
                 });
               } else if (err) {
                 return res.status(500).json({
-                  message: "There is something wrong when querying",
+                  error: "There is something wrong when querying",
                 });
               } else {
                 let event_id = eventId()
                 let values =
-                  req.body.role =
                   [
                     [
                       event_id,
@@ -61,8 +60,8 @@ module.exports = {
                 let sql = "insert into event values ?"
                 db.query(sql, [values], function (err, user) {
                   if (err || user.length === 0) {
-                    return res.status(400).json({
-                      message: "Error querying: " + err,
+                    return res.status(500).json({
+                      error: "Error querying: " + err,
                     });
                   } else {
                     console.log("USER: ", user)
@@ -81,26 +80,81 @@ module.exports = {
   },
 
   updateEvent: (req, res) => {
-
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    } else {
+      if (req.userData.role !== "organizer") {
+        return res.status(403).json({
+          error: "Forbidden !! You are not allowed to call this function"
+        })
+      } else {
+        // need to find the id of the red cross because input may use red cross id that does not exist
+        let sql = "select red_cross_id from red_cross where red_cross_id = ?"
+        let values = [[req.body.red_cross_id]]
+        db.query(sql, [values], function (err, result) {
+          if (result.length === 0) {
+            return res.status(404).json({
+              error: "Cannot find the red cross id to update",
+            });
+          } else if (err) {
+            return res.status(500).json({
+              error: "There is something wrong when querying",
+            });
+          } else {
+            let val = {
+              red_cross_id: req.body.red_cross_id,
+              event_date: req.body.date,
+              name: req.body.name,
+              location: req.body.location,
+              status: constants.pending,
+              event_id: req.params.id
+            }
+            let sql = "update event set ? where event_id = ?"
+            db.query(sql, [val, req.params.id], function (err, result) {
+              if (err) {
+                return res.status(500).json({
+                  error: "Error querying: " + err,
+                });
+              } else if (result.affectedRows === 0) {
+                return res.status(404).json({
+                  error: "Cannot find the correct event id to update"
+                });
+              } else {
+                return res.status(200).json({
+                  message: "Update successfully"
+                })
+              }
+            })
+          }
+        })
+      }
+    }
   },
   deleteEvent: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     } else {
-      let sql = "delete from event where event_id = ?"
-      let values = [[req.params.id]]
-      db.query(sql, [values], function (err, result) {
-        console.log("result: ", result)
-        if (err) {
-          return res.status(500).json({ error: "There is something wrong with the database" })
-          // if the deletion affects no rows then cannot find the given event id
-        } else if (result.affectedRows === 0) {
-          return res.status(404).json({ error: "Error cannot find the given event id" })
-        } else {
-          return res.status(200).json({ message: "Delete the event successfully" })
-        }
-      })
+      if (req.userData.role !== "organizer") {
+        return res.status(403).json({
+          error: "Forbidden !! You are not allowed to call this function"
+        })
+      } else {
+        let sql = "delete from event where event_id = ?"
+        let values = [[req.params.id]]
+        db.query(sql, [values], function (err, result) {
+          console.log("result: ", result)
+          if (err) {
+            return res.status(500).json({ error: "There is something wrong with the database" })
+            // if the deletion affects no rows then cannot find the given event id
+          } else if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Error cannot find the given event id" })
+          } else {
+            return res.status(200).json({ message: "Delete the event successfully" })
+          }
+        })
+      }
     }
   },
   searchEventWithName: (req, res) => {
@@ -146,6 +200,7 @@ module.exports = {
       })
     }
   },
+  // needs to use limit and offset (pagnitation here)
   getAllEvents: (req, res) => {
     db.query("select * from event", function (err, result) {
       if (err) {
