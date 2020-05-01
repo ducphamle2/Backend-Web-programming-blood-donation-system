@@ -5,6 +5,7 @@ module.exports = (server) => {
 
   server.use("/api/blood/", require("./controllers/blood_form/index.js"));
 
+  server.use("/api/blood_order", require("./controllers/blood_order/index.js"));
   // server.use("/api/", require("./controllers/test/index.js"));
 
   server.use("*", (req, res) => {
