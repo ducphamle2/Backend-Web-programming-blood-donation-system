@@ -73,7 +73,7 @@ CREATE TABLE notification (
 
 CREATE TABLE event (
   event_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  red_cross_id          CHAR(32)                      NOT NULL, 
+  red_cross_id          CHAR(32)                      NULL, 
   organizer_id          CHAR(32)                      NOT NULL, 
   event_date            DATETIME                      NOT NULL, 
   name                  VARCHAR(99)                   NOT NULL, 
@@ -89,7 +89,7 @@ CREATE TABLE blood (
   blood_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
   event_id              CHAR(32)                      NOT NULL, 
   donor_id              CHAR(32)                      NOT NULL, 
-  donate_date           VARCHAR(32)                       NOT NULL,
+  donate_date           VARCHAR(32)                   NOT NULL,
   amount                DOUBLE PRECISION              NULL, 
   status                VARCHAR(10)                   NULL,
   FOREIGN KEY (event_id) REFERENCES event(event_id), 
