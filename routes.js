@@ -4,11 +4,11 @@ module.exports = (server) => {
   server.use("/api/event/", require("./controllers/blood_event/index.js"));
 
   server.use("/api/blood/", require("./controllers/blood_form/index.js"));
-
+  server.use("/api/red_cross/", require("./controllers/redcross/index.js"));
   // server.use("/api/", require("./controllers/test/index.js"));
 
   server.use("*", (req, res) => {
-    console.log(req.originalUrl)
+    console.log(req.originalUrl);
     res.status(404).json({ message: "Whoops, what are you looking for?" });
   });
 };
