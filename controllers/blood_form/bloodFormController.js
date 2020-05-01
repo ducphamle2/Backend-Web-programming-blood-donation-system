@@ -36,27 +36,34 @@ module.exports = {
         db.query("select event_id from event where event_id = ?",[[req.body.event_id]], function (err, result) {
             console.log("bloodFormController | postBloodForm | result query event: " + JSON.stringify(result));
             //CHECK SQL ERROR
-            if (err) return res.status(500).json({error: "there is something wrong with the database"});
-            if (result.length === 0) return res.status(422).json({error: "event does not exists"});
+            if (err) return res.status(500).json({error: err});
+            if (result.length === 0) return res.status(423).json({error: "event does not exists"});
 
             //SAVE EVENT_ID
             req.event_id = result[0].event_id;
 
-            //EVERYTHING IS OK, START INSERT DATA: CREATE DATA TO INSERT
-            let blood_id = generateId();
-            let event_id = req.event_id;
-            let donor_id = req.userData.id;
-            let donate_date = Date.now();
-            let amount = constants.standard_blood_donation_amount;
-            let status = constants.pending;
-            let values = [ blood_id, event_id, donor_id, donate_date, amount, status ];
-
-            //RUN SQL TO STORE BLOOD DONATION FORM INTO THE DATABASE
-            db.query("insert into blood values ?",[[values]], function (err, result) {
+            //CHECK IF ALREADY INSERTED REQUEST
+            db.query("select event_id from blood where event_id = ?",[[req.body.event_id]], function (err, result) {
                 //CHECK SQL ERROR
-                if (err) return res.status(422).json({error: err});
-                return res.status(200).json({message: "success"});
-            })
+                if (err) return res.status(500).json({error: err});
+                if (result.length !== 0) return res.status(424).json({error: "request for this event already exist"});
+
+                //EVERYTHING IS OK, START INSERT DATA: CREATE DATA TO INSERT
+                let blood_id = generateId();
+                let event_id = req.event_id;
+                let donor_id = req.userData.id;
+                let donate_date = Date.now();
+                let amount = constants.standard_blood_donation_amount;
+                let status = constants.pending;
+                let values = [ blood_id, event_id, donor_id, donate_date, amount, status ];
+
+                //RUN SQL TO STORE BLOOD DONATION FORM INTO THE DATABASE
+                db.query("insert into blood values ?",[[values]], function (err, result) {
+                    //CHECK SQL ERROR
+                    if (err) return res.status(500).json({error: err});
+                    return res.status(200).json({message: "success"});
+                })
+            });
         });
 
 
