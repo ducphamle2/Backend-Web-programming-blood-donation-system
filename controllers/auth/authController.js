@@ -71,10 +71,11 @@ module.exports = {
                   error: "Auth failed",
                 });
               } else {
+                let returnedUser = user[0]
                 return res.status(200).json({
                   message: "Logged in successfully",
                   token,
-                  user
+                  returnedUser
                 });
               }
             });
