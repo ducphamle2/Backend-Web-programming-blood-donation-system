@@ -86,14 +86,12 @@ CREATE TABLE event (
   DEFAULT CHARACTER SET = utf8;
 
 CREATE TABLE blood (
-  blood_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  red_cross_id          CHAR(32)                      NOT NULL,  
+  blood_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
   event_id              CHAR(32)                      NOT NULL, 
   donor_id              CHAR(32)                      NOT NULL, 
-  donate_date           DATETIME                      NULL, 
+  donate_date           VARCHAR(32)                       NOT NULL,
   amount                DOUBLE PRECISION              NULL, 
   status                VARCHAR(10)                   NULL,
-  FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id),
   FOREIGN KEY (event_id) REFERENCES event(event_id), 
   FOREIGN KEY (donor_id) REFERENCES donor(donor_id)
 )
