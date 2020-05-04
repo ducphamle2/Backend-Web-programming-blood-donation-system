@@ -22,5 +22,6 @@ router.post("/register", [
   //   .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
   controller.register);
 
-router.get("/me", [], controller.getUserInfo);
+router.post("/me", [], controller.getUserInfo);
+
 module.exports = router;

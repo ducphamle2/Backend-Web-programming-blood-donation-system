@@ -145,12 +145,14 @@ module.exports = {
 
     getUserInfo: (req, res) => {
         try {
+            console.log("authController | req body: " + JSON.stringify(req.body));
             const token = req.body.token.split(" ")[1];
             const decoded = jwt.verify(token, process.env.SECRET_KEY, { algorithms: ["HS512"] });
             res.status(200).json({
                 userData: decoded
             })
         } catch (error) {
+            console.log(error);
             res.status(401).json({
                 message: "Auth failed"
             });
