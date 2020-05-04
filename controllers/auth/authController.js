@@ -44,8 +44,8 @@ module.exports = {
             error: "Error querying" + err,
           });
         } else if (user.length === 0) {
-          return res.status(204).json({
-            message: "Cannot find the correct user"
+          return res.status(404).json({
+            error: "Cannot find the correct user"
           })
         } else {
           let result = await bcrypt.compare(req.body.password, user[0].password)
@@ -64,7 +64,8 @@ module.exports = {
                 role === constants.role.red_cross ?
                   user[0].redcross_id : role === constants.role.organizer ?
                     user[0].organizer_id : user[0].hospital_id,
-              role: role
+              role: role,
+              name: user[0].name
             }, process.env.SECRET_KEY, { algorithm: "HS512" }, (err, token) => {
               if (err) {
                 return res.status(422).json({
@@ -138,6 +139,22 @@ module.exports = {
               });
             }
           })
+        }
+      })
+    }
+  },
+
+  getUser: (req, res) => {
+    // VALIDATE TOKEN
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ error: errors.array() });
+    } else {
+      db.query("select * from ?? where email = ?", [req.userData.role, req.userData.email], function (err, result) {
+        if (err) {
+          return res.status(500).json({ error: "there is something wrong with the database" })
+        } else {
+          return res.status(200).json({ message: "success", data: result })
         }
       })
     }
