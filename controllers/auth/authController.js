@@ -154,7 +154,8 @@ module.exports = {
         if (err) {
           return res.status(500).json({ error: "there is something wrong with the database" })
         } else {
-          return res.status(200).json({ message: "success", data: result })
+          result[0].role = req.userData.role
+          return res.status(200).json({ message: "success", data: result[0] })
         }
       })
     }
