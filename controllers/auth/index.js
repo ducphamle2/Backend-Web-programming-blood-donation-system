@@ -1,5 +1,6 @@
 const express = require("express");
 const { check } = require("express-validator/check");
+const authMiddleware = require("../../middlewares/authMiddleware.js");
 
 const controller = require("./authController.js");
 
@@ -21,5 +22,7 @@ router.post("/register", [
   // check("password", "Password should be combination of one uppercase , one lower case, one special char, one digit and min 8 , max 20 char long")
   //   .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
   controller.register);
+
+router.get("/", authMiddleware, controller.getUser)
 
 module.exports = router;
