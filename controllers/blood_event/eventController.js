@@ -214,7 +214,7 @@ module.exports = {
   },
   // needs to use limit and offset (pagnitation here)
   getAllEvents: (req, res) => {
-    db.query("select event_id, red_cross_id, organizer_id, FROM_UNIXTIME(event_date, '%Y-%m-%d %H:%i:%s') as event_date from event", function (err, result) {
+    db.query("select event_id, red_cross_id, organizer_id, DATE_FORMAT(event_date, '%Y-%m-%d %H:%i:%s') as event_date from event", function (err, result) {
       if (err) {
         return res.status(500).json({ error: "there is something wrong with the database" })
       } else {
