@@ -50,7 +50,7 @@ module.exports = {
                       event_id,
                       null,
                       req.userData.id, // id of the organizer when using token
-                      Date.parse(req.body.date) / 1000,
+                      req.body.date,
                       req.body.name,
                       req.body.location,
                       constants.pending
