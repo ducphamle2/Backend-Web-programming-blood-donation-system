@@ -6,6 +6,21 @@ const { check } = require("express-validator/check");
 
 const router = express.Router();
 
+router.get("/getpendingOrders", authMiddleware, controller.getpendingOrders);
+
+router.put(
+  "/acceptedorder/:id",
+  check("id").isLength({ min: 32, max: 32 }),
+  authMiddleware,
+  controller.acceptOrders
+);
+
+router.put(
+  "/rejectorder/:id",
+  check("id").isLength({ min: 32, max: 32 }),
+  authMiddleware,
+  controller.rejectOrders
+);
 router.get("/getpendingEvents", authMiddleware, controller.getpendingEvents);
 
 router.put(
@@ -21,7 +36,12 @@ router.put(
   authMiddleware,
   controller.rejectEvents
 );
-
+router.put(
+  "/rejectdonation/:id",
+  check("id").isLength({ min: 32, max: 32 }),
+  authMiddleware,
+  controller.rejectDonation
+);
 router.get("/getstore", authMiddleware, controller.getStore);
 router.get("/getbloodDonation", authMiddleware, controller.getbloodDonation);
 router.post(

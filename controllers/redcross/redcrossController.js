@@ -210,12 +210,13 @@ module.exports = {
             status: constants.stored,
             amount: constants.standard_blood_donation_amount,
           },
-          [constants.approved, req.params.id],
+          constants.pending,
+          req.params.id,
         ];
-        db.query(sql, [values], function (err) {
+        db.query(sql, values, function (err) {
           if (err)
             return res.status(500).json({
-              err: "There is something wrong when querying",
+              err: err,
             });
           else {
             let sql =
@@ -224,7 +225,7 @@ module.exports = {
             db.query(sql, [values], function (err, result) {
               if (err)
                 return res.status(500).json({
-                  err: "There is something wrong when querying",
+                  err: err,
                 });
               else {
                 let sql =
@@ -233,7 +234,7 @@ module.exports = {
                 db.query(sql, [values], function (err, resp) {
                   if (err)
                     return res.status(500).json({
-                      err: "There is something wrong when querying",
+                      err: err,
                     });
                   else if (resp == null) {
                     let store_id = red_cross();
@@ -246,10 +247,10 @@ module.exports = {
                         constants.standard_blood_donation_amount,
                       ],
                     ];
-                    db.query(sql, [values], function (err, resp1) {
+                    db.query(sql, values, function (err, resp1) {
                       if (err)
                         return res.status(500).json({
-                          err: "There is something wrong when querying",
+                          err: err,
                         });
                       else
                         return res.status(200).json({
@@ -261,15 +262,13 @@ module.exports = {
                     let sql =
                       "update blood_store set amount=amount+? where bloodType = ?";
                     let values = [
-                      [
-                        constants.standard_blood_donation_amount,
-                        result[0].blood_type,
-                      ],
+                      constants.standard_blood_donation_amount,
+                      result[0].blood_type,
                     ];
-                    db.query(sql, [values], function (err, resp2) {
+                    db.query(sql, values, function (err, resp2) {
                       if (err)
                         return res.status(500).json({
-                          err: "There is something wrong when querying",
+                          err: err,
                         });
                       else
                         return res.status(200).json({
@@ -299,7 +298,7 @@ module.exports = {
         });
       } else {
         let sql = "select * from blood where status = ?";
-        let values = [[constants.approved]];
+        let values = [[constants.pending]];
         db.query(sql, [values], function (err, result) {
           if (err)
             return res.status(500).json({
@@ -382,7 +381,7 @@ module.exports = {
           error: "Forbidden !! You are not allowed to call this function",
         });
       } else {
-        let sql = "select * from order where status=?";
+        let sql = "select h.name,o.* from blood_order o, hospital h where o.hospital_id=h.hospital_id and status=?";
         let values = [[constants.pending]];
         db.query(sql, [values], function (err, result) {
           if (err)
@@ -392,6 +391,35 @@ module.exports = {
           else
             return res.status(200).json({
               message: "Fetched pending orders",
+              data: result,
+            });
+        });
+      }
+    }
+  },
+  acceptOrders: (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    } else {
+      console.log("request user data: ", req.userData);
+      // only organizer can create event
+      if (req.userData.role !== constants.role.red_cross) {
+        return res.status(403).json({
+          error: "Forbidden !! You are not allowed to call this function",
+        });
+      } else {
+        let sql =
+          "update blood_order set status = ? where status = ? and order_id = ?";
+        let values = [constants.approved, constants.pending, req.params.id];
+        db.query(sql, values, function (err, result) {
+          if (err)
+            return res.status(500).json({
+              err: "There is something wrong when querying",
+            });
+          else
+            return res.status(200).json({
+              message: "approved order",
               data: result,
             });
         });
@@ -412,11 +440,11 @@ module.exports = {
       } else {
         let sql =
           "update event set status = ? where status = ? and event_id = ?";
-        let values = [[constants.approved, constants.pending, req.params.id]];
-        db.query(sql, [values], function (err, result) {
+        let values = [constants.approved, constants.pending, req.params.id];
+        db.query(sql, values, function (err, result) {
           if (err)
             return res.status(500).json({
-              err: "There is something wrong when querying",
+              err: err,
             });
           else
             return res.status(200).json({
@@ -441,15 +469,73 @@ module.exports = {
       } else {
         let sql =
           "update event set status = ? where status = ? and event_id = ?";
-        let values = [[constants.rejected, constants.pending, req.params.id]];
-        db.query(sql, [values], function (err, result) {
+        let values = [constants.rejected, constants.pending, req.params.id];
+        db.query(sql, values, function (err, result) {
           if (err)
             return res.status(500).json({
               err: "There is something wrong when querying",
             });
           else
             return res.status(200).json({
-              message: "approved event",
+              message: "rejected event",
+              data: result,
+            });
+        });
+      }
+    }
+  },
+  rejectOrders: (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    } else {
+      console.log("request user data: ", req.userData);
+      // only organizer can create event
+      if (req.userData.role !== constants.role.red_cross) {
+        return res.status(403).json({
+          error: "Forbidden !! You are not allowed to call this function",
+        });
+      } else {
+        let sql =
+          "update blood_order set status = ? where status = ? and order_id = ?";
+        let values = [constants.rejected, constants.pending, req.params.id];
+        db.query(sql, values, function (err, result) {
+          if (err)
+            return res.status(500).json({
+              err: "There is something wrong when querying",
+            });
+          else
+            return res.status(200).json({
+              message: "rejected order",
+              data: result,
+            });
+        });
+      }
+    }
+  },
+  rejectDonation: (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    } else {
+      console.log("request user data: ", req.userData);
+      // only organizer can create event
+      if (req.userData.role !== constants.role.red_cross) {
+        return res.status(403).json({
+          error: "Forbidden !! You are not allowed to call this function",
+        });
+      } else {
+        let sql =
+          "update blood set status = ? where status = ? and blood_id = ?";
+        let values = [constants.rejected, constants.pending, req.params.id];
+        db.query(sql, values, function (err, result) {
+          if (err)
+            return res.status(500).json({
+              err: "There is something wrong when querying",
+            });
+          else
+            return res.status(200).json({
+              message: "rejected donation",
               data: result,
             });
         });
