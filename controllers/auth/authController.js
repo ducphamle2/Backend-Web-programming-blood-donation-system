@@ -4,9 +4,8 @@ const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator/check");
 
 const db = require("../../database/index");
-const userId = require("../../utils/utils").generateId
 const constants = require("../../utils/constants")
-const checkRole = require("../../utils/utils").checkRole
+const utils = require("../../utils/utils")
 
 const generateHash = (password) => {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
@@ -30,7 +29,7 @@ module.exports = {
       logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ error: errors.array() });
     } else {
-      if (!checkRole(req.body.role)) {
+      if (!utils.checkRole(req.body.role)) {
         return res.status(400).json({ error: "Wrong role when login" })
       }
       let email = req.body.email
@@ -38,14 +37,13 @@ module.exports = {
       // role is used to select from correct table. Client will send the role
       let sql = 'SELECT * from ?? where email = ?'
       db.query(sql, [role, email], async function (err, user) {
-        console.log("user: ", user)
         if (err) {
           return res.status(500).json({
             error: "Error querying" + err,
           });
         } else if (user.length === 0) {
-          return res.status(204).json({
-            message: "Cannot find the correct user"
+          return res.status(404).json({
+            error: "Cannot find the correct user"
           })
         } else {
           let result = await bcrypt.compare(req.body.password, user[0].password)
@@ -64,14 +62,15 @@ module.exports = {
                 role === constants.role.red_cross ?
                   user[0].redcross_id : role === constants.role.organizer ?
                     user[0].organizer_id : user[0].hospital_id,
-              role: role
+              role: role,
+              name: user[0].name
             }, process.env.SECRET_KEY, { algorithm: "HS512" }, (err, token) => {
               if (err) {
                 return res.status(422).json({
                   error: "Auth failed",
                 });
               } else {
-                let returnedUser = user[0]
+                let returnedUser = utils.checkUserId(role, user[0])
                 return res.status(200).json({
                   message: "Logged in successfully",
                   token,
@@ -91,7 +90,7 @@ module.exports = {
       return res.status(422).json({ error: errors.array() });
     } else {
       // if it's not among four roles then return error
-      if (!checkRole(req.body.role)) {
+      if (!utils.checkRole(req.body.role)) {
         return res.status(400).json({ error: "Wrong role when registering" })
       }
       // hash the password for protection in case db is exposed
@@ -114,11 +113,11 @@ module.exports = {
             req.body.role === constants.role.hospital ?
               [
                 // insert into three values, id which is 32 characters, email and password
-                [userId(), req.body.red_cross_id, req.body.email, password, req.body.name]
+                [utils.generateId(), req.body.red_cross_id, req.body.email, password, req.body.name]
               ] :
               [
                 // insert into three values, id which is 32 characters, email and password
-                [userId(), req.body.email, password, req.body.name]
+                [utils.generateId(), req.body.email, password, req.body.name]
               ]
           // role id is used to distinguish from tables
           let role_id = req.body.role + "_id"
@@ -138,6 +137,24 @@ module.exports = {
               });
             }
           })
+        }
+      })
+    }
+  },
+
+  getUser: (req, res) => {
+    // VALIDATE TOKEN
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ error: errors.array() });
+    } else {
+      db.query("select * from ?? where email = ?", [req.userData.role, req.userData.email], function (err, result) {
+        if (err) {
+          return res.status(500).json({ error: "there is something wrong with the database" })
+        } else {
+          let payload = utils.checkUserId(req.userData.role, result[0])
+          result[0].role = req.userData.role
+          return res.status(200).json({ message: "success", data: payload })
         }
       })
     }
