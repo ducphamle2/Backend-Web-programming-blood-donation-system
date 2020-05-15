@@ -1,5 +1,6 @@
 const db = require("../../database/index");
 const eventId = require("../../utils/utils").generateId
+const utils = require("../../utils/utils")
 const constants = require("../../utils/constants")
 const { validationResult } = require("express-validator/check");
 
@@ -49,7 +50,7 @@ module.exports = {
                       event_id,
                       null,
                       req.userData.id, // id of the organizer when using token
-                      req.body.date,
+                      Date.parse(req.body.date) / 1000,
                       req.body.name,
                       req.body.location,
                       constants.pending
@@ -213,7 +214,7 @@ module.exports = {
   },
   // needs to use limit and offset (pagnitation here)
   getAllEvents: (req, res) => {
-    db.query("select * from event", function (err, result) {
+    db.query("select event_id, red_cross_id, organizer_id, FROM_UNIXTIME(event_date, '%Y-%m-%d %H:%i:%s') as event_date from event", function (err, result) {
       if (err) {
         return res.status(500).json({ error: "there is something wrong with the database" })
       } else {
