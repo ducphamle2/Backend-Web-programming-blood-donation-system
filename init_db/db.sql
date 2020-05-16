@@ -38,11 +38,7 @@ CREATE TABLE organizer (
   DEFAULT CHARACTER SET = utf8;
 
 CREATE TABLE hospital (
-<<<<<<< HEAD
-  hospital_id           CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-=======
   hospital_id           CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
->>>>>>> master
   name                  VARCHAR(99)                   NOT NULL, 
   password              VARCHAR(100)                  NOT NULL, 
   email                 VARCHAR(30)                   NOT NULL, 
@@ -100,15 +96,6 @@ CREATE TABLE blood (
   ENGINE = INNODB
   DEFAULT CHARACTER SET = utf8;
 
-<<<<<<< HEAD
-CREATE TABLE order (
-  order_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
-  hospital_id           CHAR(32)                      NOT NULL, 
-  blood_type            VARCHAR(5)                    NULL,
-  amount                DOUBLE PRECISION              NULL, 
-  status                VARCHAR(10)                   NULL,
-  FOREIGN KEY (event_id) REFERENCES hospital(hospital_id), 
-=======
 CREATE TABLE blood_order (
   order_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
   hospital_id           CHAR(32)                      NOT NULL, 
@@ -119,7 +106,6 @@ CREATE TABLE blood_order (
   status                VARCHAR(10)                   NULL,
   FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id), 
   FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id)
->>>>>>> master
 )
   ENGINE = INNODB
   DEFAULT CHARACTER SET = utf8;
