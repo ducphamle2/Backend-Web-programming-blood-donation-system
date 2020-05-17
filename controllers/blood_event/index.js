@@ -31,4 +31,6 @@ router.post("/search_with_date", check("date").isInt(), controller.searchEventWi
 
 router.get("/get_events", controller.getAllEvents)
 
+router.get("/search_event/:id", authMiddleware, controller.searchEventWithId)
+
 module.exports = router;

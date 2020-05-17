@@ -221,5 +221,14 @@ module.exports = {
         return res.status(200).json({ message: "success", data: result })
       }
     })
+  },
+  searchEventWithId: (req, res) => {
+    db.query("select * from event where event_id = ?", [req.params.id], function (err, result) {
+      if (err) {
+        return res.status(500).json({ error: "there is something wrong with the database" })
+      } else {
+        return res.status(200).json({ message: "success", data: result[0] })
+      }
+    })
   }
 };
