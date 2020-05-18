@@ -6,38 +6,54 @@ const { check } = require("express-validator/check");
 
 const router = express.Router();
 
-router.post("/create_order", authMiddleware, [
-    check("date").matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
+router.post(
+  "/create_order",
+  authMiddleware,
+  [check("date").exists().isInt({ min: 1000000000, max: 2500000000 })],
+  controller.createOrder
+);
 
-],
-    controller.createOrder);
-
-router.post("/update_order_info/:id", [
+router.post(
+  "/update_order_info/:id",
+  [
     check("id").isLength({ min: 32, max: 32 }),
-    check("date").exists().
-        matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
-],
-    authMiddleware,
-    controller.updateOrderInfo);
+    check("date").exists().isInt({ min: 1000000000, max: 2500000000 }),
+  ],
+  authMiddleware,
+  controller.updateOrderInfo
+);
 
-router.post("/update_order_status/:id", [
+router.post(
+  "/update_order_status/:id",
+  [
     check("id").isLength({ min: 32, max: 32 }),
-    check("date").exists().
-        matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
-],
-    authMiddleware,
-    controller.updateOrderStatus);
+    check("date")
+      .exists()
+      .matches(
+        /^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/,
+        "i"
+      ),
+  ],
+  authMiddleware,
+  controller.updateOrderStatus
+);
 
-router.delete("/delete_order/:id", authMiddleware, [
-    check("id").isLength({ min: 32, max: 32 }),
-],
-    controller.deleteOrder);
+router.delete(
+  "/delete_order/:id",
+  authMiddleware,
+  [check("id").isLength({ min: 32, max: 32 })],
+  controller.deleteOrder
+);
 
-router.post("/search_with_date",
-    check("date").
-        matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
-    controller.searchOrderWithDate);
+router.post(
+  "/search_with_date",
+  check("date").matches(
+    /^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/,
+    "i"
+  ),
+  controller.searchOrderWithDate
+);
 
-router.get("/get_orders", controller.getAllOrders)
+router.get("/get_orders", controller.getAllOrders);
 
 module.exports = router;

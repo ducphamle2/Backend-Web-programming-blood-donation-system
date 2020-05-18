@@ -6,23 +6,32 @@ const controller = require("./authController.js");
 
 const router = express.Router();
 
-router.post("/login", [
-  check("role").isLength({ min: 3, max: 20 }),
-  check("email").isEmail(),
-  check("password").exists()
+router.post(
+  "/login",
+  [
+    check("role").isLength({ min: 3, max: 20 }),
+    check("email").isEmail(),
+    check("password").exists(),
+  ],
+  controller.login
+);
 
-], controller.login);
-
-router.post("/register", [
-  check("role").isLength({ min: 3, max: 20 }),
-  check("password").exists(),
-  check("name").isLength({ min: 5, max: 99 }),
-  check("email").isEmail()
-],
+router.post(
+  "/register",
+  [
+    check("role").isLength({ min: 3, max: 20 }),
+    check("phone").optional().isMobilePhone(),
+    check("address").optional().isLength({ min: 3, max: 85 }),
+    check("blood_type").optional().isLength({ min: 1, max: 5 }),
+    check("password").exists(),
+    check("name").isLength({ min: 5, max: 99 }),
+    check("email").isEmail(),
+  ],
   // check("password", "Password should be combination of one uppercase , one lower case, one special char, one digit and min 8 , max 20 char long")
   //   .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
-  controller.register);
+  controller.register
+);
 
-router.get("/", authMiddleware, controller.getUser)
+router.get("/", authMiddleware, controller.getUser);
 
 module.exports = router;
