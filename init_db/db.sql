@@ -46,6 +46,7 @@ USE mydb;
 --   ENGINE = INNODB
 --   DEFAULT CHARACTER SET = utf8;
 
+<<<<<<< HEAD
 -- CREATE TABLE hospital (
 --   hospital_id           CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
 --   name                  VARCHAR(99)                   NOT NULL, 
@@ -56,6 +57,21 @@ USE mydb;
 -- )
 --   ENGINE = INNODB
 --   DEFAULT CHARACTER SET = utf8;
+=======
+CREATE TABLE hospital (
+<<<<<<< HEAD
+  hospital_id           CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
+=======
+  hospital_id           CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
+>>>>>>> master
+  name                  VARCHAR(99)                   NOT NULL, 
+  password              VARCHAR(100)                  NOT NULL, 
+  email                 VARCHAR(30)                   NOT NULL, 
+  address               VARCHAR(50)                   NULL
+)
+  ENGINE = INNODB
+  DEFAULT CHARACTER SET = utf8;
+>>>>>>> 29bc020714aa3be9498910ea8ce9fe29313bdd0d
 
 -- CREATE TABLE blood_store (
 --   store_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
@@ -67,6 +83,7 @@ USE mydb;
 --   ENGINE = INNODB
 --   DEFAULT CHARACTER SET = utf8;
 
+<<<<<<< HEAD
 -- CREATE TABLE notification (
 --   notification_id       CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
 --   red_cross_id          CHAR(32)                      NOT NULL,  
@@ -119,3 +136,58 @@ USE mydb;
 -- )
 --   ENGINE = INNODB
 --   DEFAULT CHARACTER SET = utf8;
+=======
+CREATE TABLE notification (
+  notification_id       CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
+  red_cross_id          CHAR(32)                      NOT NULL,  
+  organizer_id          CHAR(32)                      NOT NULL, 
+  noti_date             TIMESTAMP                      NULL, 
+  content               VARCHAR(50)                   NULL,
+  FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id),
+  FOREIGN KEY (organizer_id) REFERENCES organizer(organizer_id)
+)
+  ENGINE = INNODB
+  DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE event (
+  event_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
+  red_cross_id          CHAR(32)                      NULL, 
+  organizer_id          CHAR(32)                      NOT NULL, 
+  event_date            TIMESTAMP                      NOT NULL, 
+  name                  VARCHAR(99)                   NOT NULL, 
+  location              VARCHAR(99)                   NOT NULL, 
+  status                VARCHAR(10)                   NOT NULL,
+  FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id),
+  FOREIGN KEY (organizer_id) REFERENCES organizer(organizer_id)
+)
+  ENGINE = INNODB
+  DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE blood (
+  blood_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
+  event_id              CHAR(32)                      NOT NULL, 
+  donor_id              CHAR(32)                      NOT NULL, 
+  donate_date           TIMESTAMP                   NOT NULL,
+  amount                DOUBLE PRECISION              NULL, 
+  status                VARCHAR(10)                   NULL,
+  FOREIGN KEY (event_id) REFERENCES event(event_id), 
+  FOREIGN KEY (donor_id) REFERENCES donor(donor_id)
+)
+  ENGINE = INNODB
+  DEFAULT CHARACTER SET = utf8;
+
+
+CREATE TABLE blood_order (
+  order_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
+  hospital_id           CHAR(32)                      NOT NULL, 
+  red_cross_id          CHAR(32)                      NOT NULL, 
+  order_date            TIMESTAMP                      NOT NULL,
+  amount                DOUBLE PRECISION              NULL, 
+  blood_type            VARCHAR(5)                    NULL, 
+  status                VARCHAR(10)                   NULL,
+  FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id), 
+  FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id)
+)
+  ENGINE = INNODB
+  DEFAULT CHARACTER SET = utf8;
+>>>>>>> 29bc020714aa3be9498910ea8ce9fe29313bdd0d
