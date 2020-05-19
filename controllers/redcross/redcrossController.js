@@ -251,12 +251,7 @@ module.exports = {
                         constants.standard_blood_donation_amount,
                       ],
                     ];
-<<<<<<< HEAD
                     db.query(sql, [values], function (err, resp1) {
-                      console.log("res4", resp1);
-=======
-                    db.query(sql, values, function (err, resp1) {
->>>>>>> 29bc020714aa3be9498910ea8ce9fe29313bdd0d
                       if (err)
                         return res.status(500).json({
                           err: err,
@@ -273,15 +268,9 @@ module.exports = {
                     let values = [
                       constants.standard_blood_donation_amount,
                       result[0].blood_type,
-<<<<<<< HEAD
                       req.userData.id,
                     ];
                     db.query(sql, values, function (err, resp2) {
-                      console.log("res6", resp2);
-=======
-                    ];
-                    db.query(sql, values, function (err, resp2) {
->>>>>>> 29bc020714aa3be9498910ea8ce9fe29313bdd0d
                       if (err)
                         return res.status(500).json({
                           err: err,
@@ -398,12 +387,8 @@ module.exports = {
           error: "Forbidden !! You are not allowed to call this function",
         });
       } else {
-<<<<<<< HEAD
         let sql =
           "select h.name,o.* from blood_order o, hospital h where o.hospital_id=h.hospital_id and o.status=?";
-=======
-        let sql = "select h.name,o.* from blood_order o, hospital h where o.hospital_id=h.hospital_id and status=?";
->>>>>>> 29bc020714aa3be9498910ea8ce9fe29313bdd0d
         let values = [[constants.pending]];
         db.query(sql, [values], function (err, result) {
           if (err)
