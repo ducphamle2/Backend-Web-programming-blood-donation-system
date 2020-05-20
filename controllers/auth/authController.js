@@ -128,7 +128,6 @@ module.exports = {
                   [
                     utils.generateId(),
                     req.body.address,
-                    req.body.phone,
                     req.body.blood_type,
                     req.body.email,
                     password,
@@ -152,7 +151,7 @@ module.exports = {
             req.body.role === constants.role.donor
               ? "insert into ?? (" +
                 role_id +
-                ", address, phone, blood_type, email, password, name, status) values ?"
+                ", address, blood_type, email, password, name, status) values ?"
               : "insert into ?? (" +
                 role_id +
                 ", email, password, name, status) values ?";
