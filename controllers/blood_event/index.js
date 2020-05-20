@@ -21,7 +21,11 @@ router.post("/update_event/:id", [
   check("location").isLength({ min: 3, max: 99 })
 ], authMiddleware, controller.updateEvent);
 
-router.delete("/delete_event/:id", authMiddleware, [check("id").isLength({ min: 32, max: 32 })], controller.deleteEvent);
+// CHECK LENGTH OF ALL IDS IN THE ARRAY OF ID
+router.delete("/delete_events", authMiddleware, [
+  check("ids").isArray(),
+  check('ids.*.id').isLength({ min: 32, max: 32 })
+], controller.deleteEvents);
 
 router.get("/search_with_name",
   check("name").isLength({ min: 3, max: 99 })

@@ -100,7 +100,7 @@ module.exports = {
       db.query(sql, [req.body.role, req.body.name, req.body.email], function (err, result) {
         // if the name has been used then we return error
         console.log("result: ", result)
-        if (result === undefined || result.length > 0) {
+        if (result !== undefined || result.length > 0) {
           return res.status(409).json({
             error: "The name or email has already been used",
           });

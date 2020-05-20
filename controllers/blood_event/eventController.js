@@ -128,7 +128,7 @@ module.exports = {
       }
     }
   },
-  deleteEvent: (req, res) => {
+  deleteEvents: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -151,8 +151,11 @@ module.exports = {
               error: "There is something wrong when querying",
             });
           } else {
-            let sql = "delete from event where event_id = ?"
-            let values = [[req.params.id]]
+            let sql = "delete from event where event_id in (?)"
+            let values = []
+            for (let i = 0; i < req.body.ids.length; i++) {
+              values.push(req.body.ids[i].id)
+            }
             db.query(sql, [values], function (err, result) {
               console.log("result: ", result)
               if (err) {
