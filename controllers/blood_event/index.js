@@ -16,7 +16,6 @@ router.post("/create_event", authMiddleware, [
 router.post("/update_event/:id", [
   check("id").isLength({ min: 32, max: 32 }),
   check("date").isInt(),
-  check("red_cross_id").isLength({ min: 32, max: 32 }),
   check("name").isLength({ min: 3, max: 99 }),
   check("location").isLength({ min: 3, max: 99 })
 ], authMiddleware, controller.updateEvent);
