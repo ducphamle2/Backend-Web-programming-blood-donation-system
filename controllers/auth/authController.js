@@ -132,7 +132,6 @@ module.exports = {
                     req.body.email,
                     password,
                     req.body.name,
-                    constants.active,
                   ],
                 ]
               : [
@@ -142,7 +141,6 @@ module.exports = {
                     req.body.email,
                     password,
                     req.body.name,
-                    constants.active,
                   ],
                 ];
           // role id is used to distinguish from tables
@@ -151,10 +149,10 @@ module.exports = {
             req.body.role === constants.role.donor
               ? "insert into ?? (" +
                 role_id +
-                ", address, blood_type, email, password, name, status) values ?"
+                ", address, blood_type, email, password, name) values ?"
               : "insert into ?? (" +
                 role_id +
-                ", email, password, name, status) values ?";
+                ", email, password, name) values ?";
           db.query(sql, [req.body.role, values], function (err, user) {
             if (err) {
               return res.status(500).json({
