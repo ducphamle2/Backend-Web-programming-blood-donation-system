@@ -1,5 +1,6 @@
 const db = require("../../database/index");
 const eventId = require("../../utils/utils").generateId
+const utils = require("../../utils/utils")
 const constants = require("../../utils/constants")
 const { validationResult } = require("express-validator/check");
 
@@ -11,26 +12,24 @@ module.exports = {
     } else {
       console.log("request user data: ", req.userData)
       // only organizer can create event
-      if (req.userData.role !== "organizer") {
+      if (req.userData.role !== constants.role.organizer) {
         return res.status(403).json({
           error: "Forbidden !! You are not allowed to call this function"
         })
       } else {
         // need to find the id of the red cross since user can only remember name 
-        let sql = "select red_cross_id from red_cross where name = ?"
-        let values = [[req.body.red_cross_name]]
+        let sql = "select organizer_id from organizer where organizer_id = ?"
+        let values = [[req.userData.id]]
         db.query(sql, [values], function (err, result) {
           if (result.length === 0) {
             return res.status(404).json({
-              error: "Cannot find the red cross name",
+              error: "Cannot find the organizer",
             });
           } else if (err) {
             return res.status(500).json({
               error: "There is something wrong when querying",
             });
           } else {
-            let red_cross_id = result[0].red_cross_id
-            console.log("result after querying: ", red_cross_id)
             // check to see if the event name has been created or not
             let sql = "select name from event where name = ?"
             let values = [[req.body.name]]
@@ -49,7 +48,7 @@ module.exports = {
                   [
                     [
                       event_id,
-                      red_cross_id,
+                      null,
                       req.userData.id, // id of the organizer when using token
                       req.body.date,
                       req.body.name,
@@ -84,18 +83,17 @@ module.exports = {
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     } else {
-      if (req.userData.role !== "organizer") {
+      if (req.userData.role !== constants.role.organizer) {
         return res.status(403).json({
           error: "Forbidden !! You are not allowed to call this function"
         })
       } else {
-        // need to find the id of the red cross because input may use red cross id that does not exist
-        let sql = "select red_cross_id from red_cross where red_cross_id = ?"
-        let values = [[req.body.red_cross_id]]
+        let sql = "select organizer_id from organizer where organizer_id = ?"
+        let values = [[req.userData.id]]
         db.query(sql, [values], function (err, result) {
           if (result.length === 0) {
             return res.status(404).json({
-              error: "Cannot find the red cross id to update",
+              error: "Cannot find the organizer",
             });
           } else if (err) {
             return res.status(500).json({
@@ -103,7 +101,6 @@ module.exports = {
             });
           } else {
             let val = {
-              red_cross_id: req.body.red_cross_id,
               event_date: req.body.date,
               name: req.body.name,
               location: req.body.location,
@@ -136,22 +133,37 @@ module.exports = {
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     } else {
-      if (req.userData.role !== "organizer") {
+      if (req.userData.role !== constants.role.organizer) {
         return res.status(403).json({
           error: "Forbidden !! You are not allowed to call this function"
         })
       } else {
-        let sql = "delete from event where event_id = ?"
-        let values = [[req.params.id]]
+        // need to find the id of the organizer because if not hacker can use old account
+        let sql = "select organizer_id from organizer where organizer_id = ?"
+        let values = [[req.userData.id]]
         db.query(sql, [values], function (err, result) {
-          console.log("result: ", result)
-          if (err) {
-            return res.status(500).json({ error: "There is something wrong with the database" })
-            // if the deletion affects no rows then cannot find the given event id
-          } else if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Error cannot find the given event id" })
+          if (result.length === 0) {
+            return res.status(404).json({
+              error: "Cannot find the organizer",
+            });
+          } else if (err) {
+            return res.status(500).json({
+              error: "There is something wrong when querying",
+            });
           } else {
-            return res.status(200).json({ message: "Delete the event successfully" })
+            let sql = "delete from event where event_id = ?"
+            let values = [[req.params.id]]
+            db.query(sql, [values], function (err, result) {
+              console.log("result: ", result)
+              if (err) {
+                return res.status(500).json({ error: "There is something wrong with the database" })
+                // if the deletion affects no rows then cannot find the given event id
+              } else if (result.affectedRows === 0) {
+                return res.status(404).json({ error: "Error cannot find the given event id" })
+              } else {
+                return res.status(200).json({ message: "Delete the event successfully" })
+              }
+            })
           }
         })
       }
