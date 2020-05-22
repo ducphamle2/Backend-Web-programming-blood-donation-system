@@ -128,7 +128,7 @@ module.exports = {
       }
     }
   },
-  deleteEvent: (req, res) => {
+  deleteEvents: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -151,8 +151,11 @@ module.exports = {
               error: "There is something wrong when querying",
             });
           } else {
-            let sql = "delete from event where event_id = ?"
-            let values = [[req.params.id]]
+            let sql = "delete from event where event_id in (?)"
+            let values = []
+            for (let i = 0; i < req.body.ids.length; i++) {
+              values.push(req.body.ids[i].id)
+            }
             db.query(sql, [values], function (err, result) {
               console.log("result: ", result)
               if (err) {
@@ -219,6 +222,15 @@ module.exports = {
         return res.status(500).json({ error: "there is something wrong with the database" })
       } else {
         return res.status(200).json({ message: "success", data: result })
+      }
+    })
+  },
+  searchEventWithId: (req, res) => {
+    db.query("select * from event where event_id = ?", [req.params.id], function (err, result) {
+      if (err) {
+        return res.status(500).json({ error: "there is something wrong with the database" })
+      } else {
+        return res.status(200).json({ message: "success", data: result[0] })
       }
     })
   }

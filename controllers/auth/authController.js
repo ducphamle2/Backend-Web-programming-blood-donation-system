@@ -64,10 +64,10 @@ module.exports = {
                   role === constants.role.donor
                     ? user[0].donor_id
                     : role === constants.role.red_cross
-                    ? user[0].red_cross_id
-                    : role === constants.role.organizer
-                    ? user[0].organizer_id
-                    : user[0].hospital_id,
+                      ? user[0].red_cross_id
+                      : role === constants.role.organizer
+                        ? user[0].organizer_id
+                        : user[0].hospital_id,
                 role: role,
                 name: user[0].name,
               },
@@ -101,21 +101,22 @@ module.exports = {
     } else {
       // if it's not among four roles then return error
       if (!utils.checkRole(req.body.role)) {
-        return res.status(400).json({ error: "Wrong role when registering" });
+        return res.status(400).json({ error: "Wrong role when registering" })
       }
       // hash the password for protection in case db is exposed
-      let password = generateHash(req.body.password);
-      let sql = "select name, email from ?? where name = ? and email = ?";
+      let password = generateHash(req.body.password)
+      let sql = "select name, email from ?? where name = ? or email = ?"
       // check if name has been used or not, since this will be used to query in other api
-      db.query(sql, [req.body.role, req.body.name, req.body.email], function (
-        err,
-        result
-      ) {
+      db.query(sql, [req.body.role, req.body.name, req.body.email], function (err, result) {
         // if the name has been used then we return error
-        console.log("result: ", result);
-        if (result === undefined || result.length > 0) {
+        console.log("result: ", result)
+        if (result.length > 0) {
           return res.status(409).json({
             error: "The name or email has already been used",
+          });
+        } else if (result === undefined) {
+          return res.status(400).json({
+            error: "There is something wrong with the body data",
           });
         } else if (err) {
           return res.status(500).json({
@@ -123,50 +124,28 @@ module.exports = {
           });
         } else {
           let values =
-            req.body.role === constants.role.donor
-              ? [
-                  [
-                    utils.generateId(),
-                    req.body.address,
-                    req.body.blood_type,
-                    req.body.email,
-                    password,
-                    req.body.name,
-                  ],
-                ]
-              : [
-                  // insert into three values, id which is 32 characters, email and password
-                  [
-                    utils.generateId(),
-                    req.body.email,
-                    password,
-                    req.body.name,
-                  ],
-                ];
+            [
+              // insert into three values, id which is 32 characters, email and password
+              [utils.generateId(), req.body.email, password, req.body.name]
+            ]
           // role id is used to distinguish from tables
-          let role_id = req.body.role + "_id";
+          let role_id = req.body.role + "_id"
           let sql =
-            req.body.role === constants.role.donor
-              ? "insert into ?? (" +
-                role_id +
-                ", address, blood_type, email, password, name) values ?"
-              : "insert into ?? (" +
-                role_id +
-                ", email, password, name) values ?";
+            'insert into ?? (' + role_id + ', email, password, name) values ?'
           db.query(sql, [req.body.role, values], function (err, user) {
             if (err) {
               return res.status(500).json({
                 error: "Error querying: " + err,
               });
             } else {
-              console.log("USER: ", user);
+              console.log("USER: ", user)
               res.status(200).json({
-                message: "Registered successfully",
+                message: "Registered successfully"
               });
             }
-          });
+          })
         }
-      });
+      })
     }
   },
 
