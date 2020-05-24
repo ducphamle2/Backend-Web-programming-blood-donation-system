@@ -226,10 +226,13 @@ module.exports = {
     })
   },
   searchEventWithId: (req, res) => {
-    db.query("select * from event where event_id = ?", [req.params.id], function (err, result) {
+    db.query("select e.event_id, r.name as red_cross_name, o.name as organizer_name, e.name as name, e.event_date, e.location, e.status from event as e inner join organizer as o on e.organizer_id = o.organizer_id left join red_cross as r on e.red_cross_id = r.red_cross_id where e.event_id = ?", [req.params.id], function (err, result) {
       if (err) {
+        console.log("ERROR: ", err)
         return res.status(500).json({ error: "there is something wrong with the database" })
       } else {
+        if (result[0].red_cross_name === null)
+          result[0].red_cross_name = "None"
         return res.status(200).json({ message: "success", data: result[0] })
       }
     })

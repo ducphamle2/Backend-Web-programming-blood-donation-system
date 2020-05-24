@@ -73,7 +73,7 @@ CREATE TABLE event (
   event_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
   red_cross_id          CHAR(32)                      NULL, 
   organizer_id          CHAR(32)                      NOT NULL, 
-  event_date            INT(11)                      NOT NULL, 
+  event_date            INT(11)                       NOT NULL, 
   name                  VARCHAR(99)                   NOT NULL, 
   location              VARCHAR(99)                   NOT NULL, 
   status                VARCHAR(10)                   NOT NULL,
