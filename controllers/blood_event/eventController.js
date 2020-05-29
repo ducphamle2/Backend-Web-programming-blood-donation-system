@@ -3,6 +3,7 @@ const eventId = require("../../utils/utils").generateId
 const utils = require("../../utils/utils")
 const constants = require("../../utils/constants")
 const { validationResult } = require("express-validator/check");
+const io = require('../socket/socket.js').getIo();
 
 module.exports = {
   createEvent: (req, res) => {
@@ -231,6 +232,7 @@ module.exports = {
         console.log("ERROR: ", err)
         return res.status(500).json({ error: "there is something wrong with the database" })
       } else {
+        io.to("ABCD").emit("test", "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         if (result[0].red_cross_name === null)
           result[0].red_cross_name = "None"
         return res.status(200).json({ message: "success", data: result[0] })
