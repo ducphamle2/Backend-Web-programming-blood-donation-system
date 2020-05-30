@@ -163,6 +163,10 @@ module.exports = {
                         return res
                             .status(500)
                             .json({error: "there is something wrong with the database"});
+                    } else if (result.length === 0) {
+                        return res
+                            .status(401)
+                            .json({error: "Cannot find correct user"});
                     } else {
                         let payload = utils.checkUserId(req.userData.role, result[0]);
                         result[0].role = req.userData.role;
@@ -199,8 +203,8 @@ module.exports = {
                             error: err,
                         });
                     } else if (result.affectedRows === 0) {
-                        return res.status(404).json({
-                            error: "Cannot find the correct user email to update"
+                        return res.status(203).json({
+                            error: "No change were made"
                         });
                     } else {
                         return res.status(200).json({
