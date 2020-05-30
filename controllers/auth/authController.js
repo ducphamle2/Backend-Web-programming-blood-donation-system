@@ -224,7 +224,7 @@ module.exports = {
                 };
 
                 //UPDATE SQL
-                db.query("update ? set ? where email = ?", [req.userData.role, val2, req.userData.email], function (err, result) {
+                db.query("update ?? set ? where email = ?", [req.userData.role, val2, req.userData.email], function (err, result) {
                     if (err) {
                         return res.status(500).json({
                             error: err,
