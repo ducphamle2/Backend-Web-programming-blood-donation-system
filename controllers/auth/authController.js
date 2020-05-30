@@ -182,65 +182,84 @@ module.exports = {
         let errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(422).json({errors: errors.array()});
 
-        //CHECK USER DATA
+        //LOG USER DATA
         console.log("authController | updateUserProfile | req user data: ", req.userData);
 
-        //HANDLE DIFFERENT ROLE
-        switch (req.userData.role) {
-            case constants.role.donor:
-                //DEFINE DATA
-                let val = {
-                    name: req.body.name,
-                    email: req.body.email,
-                    address: req.body.address ? req.body.address : "",
-                    dob: req.body.dob ? req.body.dob : 0,
-                };
-
-                //UPDATE SQL
-                db.query("update donor set ? where email = ?", [val, req.userData.email], function (err, result) {
-                    if (err) {
-                        return res.status(500).json({
-                            error: err,
-                        });
-                    } else if (result.affectedRows === 0) {
-                        return res.status(203).json({
-                            error: "No change were made"
-                        });
-                    } else {
-                        return res.status(200).json({
-                            message: "Update successfully"
-                        })
+        // check if name has been used or not, since this will be used to query in other api
+        let sql = "select name, email from ?? where name = ? or email = ?";
+        db.query(sql, [req.userData.role, req.body.name, req.body.email], function (err, result) {
+                console.log("result: ", result);
+                if (err) {
+                    return res.status(500).json({
+                        "error": err
+                    });
+                } else if (result !== undefined) {
+                    // IF THE USERNAME OR EMAIL HAS BEEN USED BY ANOTHER USER, RETURN ERROR
+                    if (result.length) {
+                        for (let i = 0; i < result.length; i += 1) {
+                            if ((result[i].email === req.userData.email && result[i].name === req.userData.name)) continue;
+                            else return res.status(409).json({
+                                    error: "The name or email has already been used",
+                            });
+                        }
                     }
-                });
-                break;
-            case constants.role.hospital:
-            case constants.role.organizer:
-            case constants.role.red_cross:
-            default:
-                //DEFINE DATA
-                let val2 = {
-                    name: req.body.name,
-                    email: req.body.email
-                };
 
-                //UPDATE SQL
-                db.query("update ?? set ? where email = ?", [req.userData.role, val2, req.userData.email], function (err, result) {
-                    if (err) {
-                        return res.status(500).json({
-                            error: err,
-                        });
-                    } else if (result.affectedRows === 0) {
-                        return res.status(404).json({
-                            error: "Cannot find the correct user email to update"
-                        });
-                    } else {
-                        return res.status(200).json({
-                            message: "Update successfully"
-                        })
+                    //EVERY THING IS OK, START UPDATE DATA ON THE DB
+                    switch (req.userData.role) {
+                        case constants.role.donor:
+                            //DEFINE DATA
+                            let val = {
+                                name: req.body.name,
+                                email: req.body.email,
+                                address: req.body.address ? req.body.address : "",
+                                dob: req.body.dob ? req.body.dob : 0,
+                            };
+
+                            //UPDATE SQL
+                            db.query("update donor set ? where email = ?", [val, req.userData.email], function (err, result) {
+                                if (err) {
+                                    return res.status(500).json({
+                                        error: err,
+                                    });
+                                } else {
+                                    return res.status(200).json({
+                                        message: "Update successfully"
+                                    })
+                                }
+                            });
+                            break;
+                        case constants.role.hospital:
+                        case constants.role.organizer:
+                        case constants.role.red_cross:
+                        default:
+                            //DEFINE DATA
+                            let val2 = {
+                                name: req.body.name,
+                                email: req.body.email
+                            };
+
+                            //UPDATE SQL
+                            db.query("update ?? set ? where email = ?", [req.userData.role, val2, req.userData.email], function (err, result) {
+                                if (err) {
+                                    return res.status(500).json({
+                                        error: err,
+                                    });
+                                } else {
+                                    return res.status(200).json({
+                                        message: "Update successfully"
+                                    })
+                                }
+                            });
+                            break;
                     }
-                });
-                break;
-        }
 
+
+                } else {
+                    return res.status(500).json({
+                        "message": "SQL return undefined result"
+                    });
+                }
+            }
+        );
     }
 };
