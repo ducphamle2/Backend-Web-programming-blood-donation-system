@@ -23,6 +23,11 @@ router.post("/register", [
   //   .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
   controller.register);
 
+router.post("/update", [
+    check("email").isEmail(),
+    check("name").isLength({ min: 5, max: 99 }),
+], authMiddleware, controller.updateUserProfile);
+
 router.get("/", authMiddleware, controller.getUser)
 
 module.exports = router;
