@@ -2,15 +2,13 @@ FROM node
 
 WORKDIR /app
 
-COPY package.json /app
+COPY . /app
 
 RUN npm install
 
-COPY . /app
-
-CMD node server.js
-
 EXPOSE 8080
+
+CMD ["node", "server.js"]
 
 
 
