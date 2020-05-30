@@ -90,6 +90,10 @@ CREATE TABLE blood (
   donate_date           INT(11)                   NOT NULL,
   amount                DOUBLE PRECISION              NULL, 
   status                VARCHAR(10)                   NULL,
+  event_date            INT(11)                      NOT NULL,
+  name                  VARCHAR(99)                   NOT NULL,
+  location              VARCHAR(99)                   NOT NULL,
+
   FOREIGN KEY (event_id) REFERENCES event(event_id), 
   FOREIGN KEY (donor_id) REFERENCES donor(donor_id)
 )

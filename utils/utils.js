@@ -18,6 +18,7 @@ module.exports = {
 
   // CHANGE KEY TO RETURN ONLY ID FOR CLIENT, CLIENT DOES NOT HAVE TO CHECK ID TYPE
   checkUserId: (role, user) => {
+    console.log("utils | role: " + role + " | user: " + user);
     let new_key = "userId"
     let old_key = ""
     if (role === constants.role.donor)

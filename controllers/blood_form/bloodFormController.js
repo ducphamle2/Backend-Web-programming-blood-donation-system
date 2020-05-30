@@ -33,7 +33,7 @@ module.exports = {
         if (req.userData.role !== constants.role.donor) return res.status(403).json({error: "Forbidden !! You are not allowed to call this function"});
 
         //CHECK IF EVENT EXISTS
-        db.query("select event_id from event where event_id = ?", [[req.body.event_id]], function (err, result) {
+        db.query("select * from event where event_id = ?", [[req.body.event_id]], function (err, result) {
             console.log("bloodFormController | postBloodForm | result query event: " + JSON.stringify(result));
             //CHECK SQL ERROR
             if (err) return res.status(500).json({error: err});
@@ -41,6 +41,9 @@ module.exports = {
 
             //SAVE EVENT_ID
             req.event_id = result[0].event_id;
+            req.name = result[0].name;
+            req.event_date = result[0].event_date;
+            req.location = result[0].location;
 
             //CHECK IF ALREADY INSERTED REQUEST
             db.query("select event_id from blood where event_id = ? && donor_id = ?", [[req.body.event_id], [req.userData.id]], function (err, result) {
@@ -52,10 +55,13 @@ module.exports = {
                 let blood_id = generateId();
                 let event_id = req.event_id;
                 let donor_id = req.userData.id;
-                let donate_date = Date.now();
+                let donate_date = Date.now() / 1000;
                 let amount = constants.standard_blood_donation_amount;
-                let status = constants.pending;
-                let values = [blood_id, event_id, donor_id, donate_date, amount, status];
+                let status = constants.approved;
+                let event_date = req.event_date;
+                let name = req.name;
+                let location = req.location;
+                let values = [blood_id, event_id, donor_id, donate_date, amount, status, event_date, name, location];
 
                 //RUN SQL TO STORE BLOOD DONATION FORM INTO THE DATABASE
                 db.query("insert into blood values ?", [[values]], function (err, result) {
