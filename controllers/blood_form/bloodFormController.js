@@ -16,9 +16,11 @@ module.exports = {
       req.userData
     );
     if (req.userData.role !== constants.role.donor)
-      return res.status(403).json({
-        error: "Forbidden !! You are not allowed to call this function",
-      });
+      return res
+        .status(403)
+        .json({
+          error: "Forbidden !! You are not allowed to call this function",
+        });
 
     //EVERYTHING IS OK
     db.query(
@@ -45,9 +47,11 @@ module.exports = {
       req.userData
     );
     if (req.userData.role !== constants.role.donor)
-      return res.status(403).json({
-        error: "Forbidden !! You are not allowed to call this function",
-      });
+      return res
+        .status(403)
+        .json({
+          error: "Forbidden !! You are not allowed to call this function",
+        });
 
     //CHECK IF EVENT EXISTS
     db.query(
