@@ -1,7 +1,12 @@
 const db = require("../../database/index");
 const eventId = require("../../utils/utils").generateId;
+<<<<<<< HEAD
+=======
+const utils = require("../../utils/utils");
+>>>>>>> master
 const constants = require("../../utils/constants");
 const { validationResult } = require("express-validator/check");
+//const io = require('../socket/socket.js').getIo();
 
 module.exports = {
   createEvent: (req, res) => {
@@ -32,7 +37,10 @@ module.exports = {
             // check to see if the event name has been created or not
             let sql = "select name from event where name = ?";
             let values = [[req.body.name]];
+<<<<<<< HEAD
             console.log("name", values);
+=======
+>>>>>>> master
             db.query(sql, [values], function (err, result) {
               console.log("sss", result);
               if (result.length) {
@@ -45,8 +53,11 @@ module.exports = {
                 });
               } else {
                 let event_id = eventId();
+<<<<<<< HEAD
 
                 // Will display time
+=======
+>>>>>>> master
                 let values = [
                   [
                     event_id,
@@ -130,7 +141,7 @@ module.exports = {
       }
     }
   },
-  deleteEvent: (req, res) => {
+  deleteEvents: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -153,8 +164,16 @@ module.exports = {
               error: "There is something wrong when querying",
             });
           } else {
+<<<<<<< HEAD
             let sql = "delete from event where event_id = ?";
             let values = [[req.params.id]];
+=======
+            let sql = "delete from event where event_id in (?)";
+            let values = [];
+            for (let i = 0; i < req.body.ids.length; i++) {
+              values.push(req.body.ids[i].id);
+            }
+>>>>>>> master
             db.query(sql, [values], function (err, result) {
               console.log("result: ", result);
               if (err) {
@@ -222,14 +241,38 @@ module.exports = {
   },
   // needs to use limit and offset (pagnitation here)
   getAllEvents: (req, res) => {
-    db.query("select event_id, red_cross_id, organizer_id, DATE_FORMAT(event_date, '%Y-%m-%d %H:%i:%s') as event_date from event", function (err, result) {
+    db.query("select * from event", function (err, result) {
       if (err) {
         return res
           .status(500)
           .json({ error: "there is something wrong with the database" });
       } else {
         return res.status(200).json({ message: "success", data: result });
+<<<<<<< HEAD
       }
     });
+=======
+      }
+    });
+  },
+  searchEventWithId: (req, res) => {
+    db.query(
+      "select e.event_id, r.name as red_cross_name, o.name as organizer_name, e.name as name, e.event_date, e.location, e.status from event as e inner join organizer as o on e.organizer_id = o.organizer_id left join red_cross as r on e.red_cross_id = r.red_cross_id where e.event_id = ?",
+      [req.params.id],
+      function (err, result) {
+        if (err) {
+          console.log("ERROR: ", err);
+          return res
+            .status(500)
+            .json({ error: "there is something wrong with the database" });
+        } else {
+          //io.to("ABCD").emit("test", "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+          if (result[0].red_cross_name === null)
+            result[0].red_cross_name = "None";
+          return res.status(200).json({ message: "success", data: result[0] });
+        }
+      }
+    );
+>>>>>>> master
   },
 };

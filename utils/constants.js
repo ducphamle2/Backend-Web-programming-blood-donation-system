@@ -5,7 +5,6 @@ module.exports = {
   stored: "stored",
   closed: "closed",
   active: "active",
-  disable: "disable",
   role: {
     donor: "donor",
     organizer: "organizer",

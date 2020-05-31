@@ -32,6 +32,11 @@ router.post(
   controller.register
 );
 
-router.get("/", authMiddleware, controller.getUser);
+router.post("/update", [
+    check("email").isEmail(),
+    check("name").isLength({ min: 5, max: 99 }),
+], authMiddleware, controller.updateUserProfile);
+
+router.get("/", authMiddleware, controller.getUser)
 
 module.exports = router;

@@ -6,7 +6,7 @@ const { check } = require("express-validator/check");
 
 const router = express.Router();
 
-router.get("/getpendingOrders", authMiddleware, controller.getpendingOrders);
+router.get("/getpendingOrders", controller.getpendingOrders);
 
 router.put(
   "/acceptedorder/:id",
@@ -23,6 +23,8 @@ router.put(
 );
 router.get("/getpendingEvents", authMiddleware, controller.getpendingEvents);
 router.get("/getDonors", authMiddleware, controller.getDonors);
+router.get("/getHospitals", authMiddleware, controller.getHospitals);
+router.get("/getOrganizers", authMiddleware, controller.getOrganizers);
 router.put(
   "/acceptedevent/:id",
   check("id").isLength({ min: 32, max: 32 }),
@@ -44,11 +46,29 @@ router.put(
 );
 router.get("/getstore", authMiddleware, controller.getStore);
 router.get("/getbloodDonation", authMiddleware, controller.getbloodDonation);
+router.get("/get_approved_events", controller.getAllApprovedEvents);
+router.get(
+  "/getUntestedBloodDonation",
+  authMiddleware,
+  controller.getUntestedBloodDonation
+);
 router.post(
   "/store/:id",
   authMiddleware,
   check("id").isLength({ min: 32, max: 32 }),
   controller.store
 );
-
+router.post(
+  "/reactivate/:id",
+  authMiddleware,
+  check("id").isLength({ min: 32, max: 32 }),
+  controller.reactivateAccount
+);
+router.post(
+  "/banned/:id",
+  authMiddleware,
+  check("id").isLength({ min: 32, max: 32 }),
+  controller.bannedAccount
+);
+router.post("/testBlood/:id", authMiddleware, controller.testBlood);
 module.exports = router;
