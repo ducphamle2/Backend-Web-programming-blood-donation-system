@@ -1,9 +1,6 @@
 const db = require("../../database/index");
 const eventId = require("../../utils/utils").generateId;
-<<<<<<< HEAD
-=======
 const utils = require("../../utils/utils");
->>>>>>> master
 const constants = require("../../utils/constants");
 const { validationResult } = require("express-validator/check");
 //const io = require('../socket/socket.js').getIo();
@@ -37,10 +34,6 @@ module.exports = {
             // check to see if the event name has been created or not
             let sql = "select name from event where name = ?";
             let values = [[req.body.name]];
-<<<<<<< HEAD
-            console.log("name", values);
-=======
->>>>>>> master
             db.query(sql, [values], function (err, result) {
               console.log("sss", result);
               if (result.length) {
@@ -53,11 +46,6 @@ module.exports = {
                 });
               } else {
                 let event_id = eventId();
-<<<<<<< HEAD
-
-                // Will display time
-=======
->>>>>>> master
                 let values = [
                   [
                     event_id,
@@ -164,16 +152,11 @@ module.exports = {
               error: "There is something wrong when querying",
             });
           } else {
-<<<<<<< HEAD
-            let sql = "delete from event where event_id = ?";
-            let values = [[req.params.id]];
-=======
             let sql = "delete from event where event_id in (?)";
             let values = [];
             for (let i = 0; i < req.body.ids.length; i++) {
               values.push(req.body.ids[i].id);
             }
->>>>>>> master
             db.query(sql, [values], function (err, result) {
               console.log("result: ", result);
               if (err) {
@@ -248,10 +231,6 @@ module.exports = {
           .json({ error: "there is something wrong with the database" });
       } else {
         return res.status(200).json({ message: "success", data: result });
-<<<<<<< HEAD
-      }
-    });
-=======
       }
     });
   },
@@ -273,6 +252,5 @@ module.exports = {
         }
       }
     );
->>>>>>> master
   },
 };
