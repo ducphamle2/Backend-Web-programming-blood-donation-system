@@ -4,6 +4,7 @@ module.exports = {
   rejected: "rejected",
   stored: "stored",
   closed: "closed",
+  active: "active",
   role: {
     donor: "donor",
     organizer: "organizer",

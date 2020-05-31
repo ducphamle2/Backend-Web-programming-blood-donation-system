@@ -4,7 +4,6 @@ GRANT ALL PRIVILEGES ON *.* TO 'user'@'localhost' IDENTIFIED BY 'password';
 
 create database mydb;
 USE mydb;
-
 CREATE TABLE donor (
   donor_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
   name                  VARCHAR(99)                   NOT NULL,
@@ -91,6 +90,7 @@ CREATE TABLE blood (
   amount                DOUBLE PRECISION              NULL, 
   status                VARCHAR(10)                   NULL,
   event_date            INT(11)                      NOT NULL,
+  blood_type            VARCHAR(5)                    NULL, 
   name                  VARCHAR(99)                   NOT NULL,
   location              VARCHAR(99)                   NOT NULL,
 
@@ -103,13 +103,11 @@ CREATE TABLE blood (
 CREATE TABLE blood_order (
   order_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
   hospital_id           CHAR(32)                      NOT NULL, 
-  red_cross_id          CHAR(32)                      NOT NULL, 
   order_date            INT(11)                      NOT NULL,
   amount                DOUBLE PRECISION              NULL, 
   blood_type            VARCHAR(5)                    NULL, 
   status                VARCHAR(10)                   NULL,
-  FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id), 
-  FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id)
+  FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id)
 )
   ENGINE = INNODB
   DEFAULT CHARACTER SET = utf8;
