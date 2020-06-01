@@ -3,8 +3,8 @@ const eventId = require("../../utils/utils").generateId
 const utils = require("../../utils/utils")
 const constants = require("../../utils/constants")
 const { validationResult } = require("express-validator/check");
-//const io = require('../socket/socket.js').getIo();
-//const notificationController = require("../notification/notificationController")
+const io = require('../socket/socket.js').getIo();
+const notificationController = require("../notification/notificationController")
 
 module.exports = {
   createEvent: (req, res) => {
@@ -67,11 +67,13 @@ module.exports = {
                       error: "Error querying: " + err,
                     });
                   } else {
-                    // let result = notificationController.createNotification(constants.role.organizer, req.userData.id, req.body.noti_content)
-                    // if (result)
-                    //   console.log("INSERT NEW NOTIFICATION IN CREATING EVENT SUCCESSFULLY")
-                    // else
-                    //   console.log("INSERT NOTIFICATION IN CREATING EVENT FAILED")
+                    let result = notificationController.createNotification(constants.role.organizer, req.userData.id, req.body.noti_content)
+                    if (result) {
+                      console.log("INSERT NEW NOTIFICATION IN CREATING EVENT SUCCESSFULLY")
+                      io.emit("create_event", "new event created")
+                    }
+                    else
+                      console.log("INSERT NOTIFICATION IN CREATING EVENT FAILED")
                     return res.status(200).json({
                       message: "Your event has been created successfully",
                       event_id: event_id
