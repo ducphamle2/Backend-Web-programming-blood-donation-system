@@ -59,12 +59,16 @@ CREATE TABLE blood_store (
 
 CREATE TABLE notification (
   notification_id       CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  red_cross_id          CHAR(32)                      NOT NULL,  
-  organizer_id          CHAR(32)                      NOT NULL, 
-  noti_date             INT(11)                      NULL, 
-  content               VARCHAR(50)                   NULL,
+  red_cross_id          CHAR(32)                      NULL,  
+  organizer_id          CHAR(32)                      NULL,
+  hospital_id           CHAR(32)                      NULL,
+  donor_id              CHAR(32)                      NULL, 
+  noti_date             INT(11)                       NULL, 
+  content               VARCHAR(99)                   NULL,
   FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id),
-  FOREIGN KEY (organizer_id) REFERENCES organizer(organizer_id)
+  FOREIGN KEY (organizer_id) REFERENCES organizer(organizer_id),
+  FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id),
+  FOREIGN KEY (donor_id) REFERENCES donor(donor_id)
 )
   ENGINE = INNODB
   DEFAULT CHARACTER SET = utf8;

@@ -36,5 +36,9 @@ module.exports = {
     delete user[old_key];
 
     return user
+  },
+
+  timeConverter: (javascript_timestamp) => {
+    return Math.round(javascript_timestamp.getTime() / 1000);
   }
 }
