@@ -10,7 +10,7 @@ module.exports = (server) => {
   // server.use("/api/", require("./controllers/test/index.js"));
 
   server.use("*", (req, res) => {
-    console.log(req.originalUrl);
+    console.log("Original url: ", req.originalUrl);
     res.status(404).json({ message: "Whoops, what are you looking for?" });
   });
 };
