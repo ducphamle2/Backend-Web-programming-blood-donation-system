@@ -7,6 +7,7 @@ services:
             - 8080:8080
         volumes:
             - ./:/app
+            - /app/node_modules
         env_file: .env
         depends_on:
             - mysql

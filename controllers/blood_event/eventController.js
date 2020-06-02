@@ -3,6 +3,8 @@ const eventId = require("../../utils/utils").generateId
 const utils = require("../../utils/utils")
 const constants = require("../../utils/constants")
 const { validationResult } = require("express-validator/check");
+//const io = require('../socket/socket.js').getIo();
+//const notificationController = require("../notification/notificationController")
 
 module.exports = {
   createEvent: (req, res) => {
@@ -34,13 +36,15 @@ module.exports = {
             let sql = "select name from event where name = ?"
             let values = [[req.body.name]]
             db.query(sql, [values], function (err, result) {
-              if (result.length > 0) {
-                return res.status(409).json({
-                  error: "This event has been created already !!",
-                });
-              } else if (err) {
+              console.log("RESULT: ", result)
+              if (err) {
+                console.log("ERROR: ", err)
                 return res.status(500).json({
                   error: "There is something wrong when querying",
+                });
+              } else if (result.length > 0) {
+                return res.status(409).json({
+                  error: "This event has been created already !!",
                 });
               } else {
                 let event_id = eventId()
@@ -63,7 +67,11 @@ module.exports = {
                       error: "Error querying: " + err,
                     });
                   } else {
-                    console.log("USER: ", user)
+                    // let result = notificationController.createNotification(constants.role.organizer, req.userData.id, req.body.noti_content)
+                    // if (result)
+                    //   console.log("INSERT NEW NOTIFICATION IN CREATING EVENT SUCCESSFULLY")
+                    // else
+                    //   console.log("INSERT NOTIFICATION IN CREATING EVENT FAILED")
                     return res.status(200).json({
                       message: "Your event has been created successfully",
                       event_id: event_id
@@ -91,13 +99,13 @@ module.exports = {
         let sql = "select organizer_id from organizer where organizer_id = ?"
         let values = [[req.userData.id]]
         db.query(sql, [values], function (err, result) {
-          if (result.length === 0) {
-            return res.status(404).json({
-              error: "Cannot find the organizer",
-            });
-          } else if (err) {
+          if (err) {
             return res.status(500).json({
               error: "There is something wrong when querying",
+            });
+          } else if (result.length === 0) {
+            return res.status(404).json({
+              error: "Cannot find the organizer",
             });
           } else {
             let val = {
@@ -142,13 +150,13 @@ module.exports = {
         let sql = "select organizer_id from organizer where organizer_id = ?"
         let values = [[req.userData.id]]
         db.query(sql, [values], function (err, result) {
-          if (result.length === 0) {
-            return res.status(404).json({
-              error: "Cannot find the organizer",
-            });
-          } else if (err) {
+          if (err) {
             return res.status(500).json({
               error: "There is something wrong when querying",
+            });
+          } else if (result.length === 0) {
+            return res.status(404).json({
+              error: "Cannot find the organizer",
             });
           } else {
             let sql = "delete from event where event_id in (?)"
@@ -226,10 +234,14 @@ module.exports = {
     })
   },
   searchEventWithId: (req, res) => {
-    db.query("select * from event where event_id = ?", [req.params.id], function (err, result) {
+    db.query("select e.event_id, r.name as red_cross_name, o.name as organizer_name, e.name as name, e.event_date, e.location, e.status from event as e inner join organizer as o on e.organizer_id = o.organizer_id left join red_cross as r on e.red_cross_id = r.red_cross_id where e.event_id = ?", [req.params.id], function (err, result) {
       if (err) {
+        console.log("ERROR: ", err)
         return res.status(500).json({ error: "there is something wrong with the database" })
       } else {
+        //io.to("ABCD").emit("test", "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+        if (result[0].red_cross_name === null)
+          result[0].red_cross_name = "None"
         return res.status(200).json({ message: "success", data: result[0] })
       }
     })

@@ -9,7 +9,8 @@ const router = express.Router();
 router.post("/create_event", authMiddleware, [
   check("name").isLength({ min: 3, max: 99 }),
   check("date").isInt(),
-  check("location").isLength({ min: 3, max: 99 })
+  check("location").isLength({ min: 3, max: 99 }),
+  //check("noti_content").isLength({ min: 3, max: 99 })
 ],
   controller.createEvent);
 

@@ -2,15 +2,15 @@ FROM node
 
 WORKDIR /app
 
-COPY package.json /app
+COPY ./ /app
 
 RUN npm install
 
-COPY . /app
-
-CMD node server.js
+RUN npm install -g nodemon
 
 EXPOSE 8080
+
+CMD ["nodemon", "server.js"]
 
 
 
