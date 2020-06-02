@@ -199,7 +199,7 @@ module.exports = {
                         for (let i = 0; i < result.length; i += 1) {
                             if ((result[i].email === req.userData.email && result[i].name === req.userData.name)) continue;
                             else return res.status(409).json({
-                                    error: "The name or email has already been used",
+                                error: "The name or email has already been used",
                             });
                         }
                     }
@@ -261,5 +261,46 @@ module.exports = {
                 }
             }
         );
+    },
+
+    updatePassword: function (req, res) {
+        //CHECK ERROR INPUT
+        let errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(422).json({errors: errors.array()});
+
+        //DATA SENT FROM CLIENT
+        let password = req.body.password;
+        let confirm_password = req.body.confirm_password;
+        let new_password = req.body.new_password;
+
+        //LOG USER DATA
+        console.log("authController | updatePassword | req user data: ", req.userData);
+
+        let sql = "select * from ?? where email = ?";
+        db.query(sql, [req.userData.role, req.userData.email], async function (err, result) {
+            console.log("authController | updatePassword | result: " + result);
+            if (err) return res.status(500).json({
+                "message": "SQL return undefined result",
+                "error": err
+            }); else {
+                if (result[0]) {
+                    //CHECK VALIDATION OF USER POST DATA
+                    let resultPassword = await bcrypt.compare(password, result[0].password);
+                    if (!resultPassword || resultPassword.length === 0) return res.status(401).json({"password": "Wrong password"});
+                    if (new_password !== confirm_password) return res.status(401).json({"new_password": "Password does not match"});
+
+                    //RUN SQL UPDATE
+                    let val = {password: generateHash(new_password)};
+                    db.query("update ?? set ? where email = ?", [req.userData.role, val, req.userData.email], function (err, result) {
+                        if (err) return res.status(500).json({error: err,});
+                        else return res.status(200).json({message: "Update successfully"});
+
+                    });
+
+                } else {
+                    return res.status(426).json({"error": "unexpected error"});
+                }
+            }
+        });
     }
 };
