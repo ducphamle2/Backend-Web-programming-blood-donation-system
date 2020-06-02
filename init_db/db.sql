@@ -4,7 +4,6 @@ GRANT ALL PRIVILEGES ON *.* TO 'user'@'localhost' IDENTIFIED BY 'password';
 
 create database mydb;
 USE mydb;
-
 CREATE TABLE donor (
   donor_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
   name                  VARCHAR(99)                   NOT NULL,
@@ -49,7 +48,7 @@ CREATE TABLE hospital (
 
 CREATE TABLE blood_store (
   store_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  red_cross_id          CHAR(32) UNIQUE               NOT NULL, 
+  red_cross_id          CHAR(32)               NOT NULL, 
   bloodType             VARCHAR(5)                    NOT NULL, 
   amount                DOUBLE PRECISION              NULL,
   FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id)

@@ -52,6 +52,13 @@ router.get(
   authMiddleware,
   controller.getUntestedBloodDonation
 );
+router.get("/getAcceptedEvents", authMiddleware, controller.getacceptedEvents);
+router.get("/getAcceptedOrders", authMiddleware, controller.getacceptedOrders);
+router.get(
+  "/getStoredBloodDonations",
+  authMiddleware,
+  controller.getstoredbloodDonation
+);
 router.post(
   "/store/:id",
   authMiddleware,
