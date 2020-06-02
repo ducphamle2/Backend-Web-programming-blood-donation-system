@@ -63,10 +63,10 @@ module.exports = {
                   role === constants.role.donor
                     ? user[0].donor_id
                     : role === constants.role.red_cross
-                    ? user[0].red_cross_id
-                    : role === constants.role.organizer
-                    ? user[0].organizer_id
-                    : user[0].hospital_id,
+                      ? user[0].red_cross_id
+                      : role === constants.role.organizer
+                        ? user[0].organizer_id
+                        : user[0].hospital_id,
                 role: role,
                 name: user[0].name,
               },
@@ -112,17 +112,13 @@ module.exports = {
       ) {
         // if the name has been used then we return error
         console.log("result: ", result);
-        if (result === undefined) {
-          return res.status(400).json({
-            error: "There is something wrong with the body data",
+        if (err) {
+          return res.status(500).json({
+            error: "There is something wrong when querying: " + err,
           });
         } else if (result.length > 0) {
           return res.status(409).json({
             error: "The name or email has already been used",
-          });
-        } else if (err) {
-          return res.status(500).json({
-            error: "There is something wrong when querying: " + err,
           });
         } else {
           let values = [

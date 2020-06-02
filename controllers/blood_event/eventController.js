@@ -4,6 +4,7 @@ const utils = require("../../utils/utils")
 const constants = require("../../utils/constants")
 const { validationResult } = require("express-validator/check");
 //const io = require('../socket/socket.js').getIo();
+//const notificationController = require("../notification/notificationController")
 
 module.exports = {
   createEvent: (req, res) => {
@@ -35,13 +36,15 @@ module.exports = {
             let sql = "select name from event where name = ?"
             let values = [[req.body.name]]
             db.query(sql, [values], function (err, result) {
-              if (result.length > 0) {
-                return res.status(409).json({
-                  error: "This event has been created already !!",
-                });
-              } else if (err) {
+              console.log("RESULT: ", result)
+              if (err) {
+                console.log("ERROR: ", err)
                 return res.status(500).json({
                   error: "There is something wrong when querying",
+                });
+              } else if (result.length > 0) {
+                return res.status(409).json({
+                  error: "This event has been created already !!",
                 });
               } else {
                 let event_id = eventId()
@@ -64,7 +67,11 @@ module.exports = {
                       error: "Error querying: " + err,
                     });
                   } else {
-                    console.log("USER: ", user)
+                    // let result = notificationController.createNotification(constants.role.organizer, req.userData.id, req.body.noti_content)
+                    // if (result)
+                    //   console.log("INSERT NEW NOTIFICATION IN CREATING EVENT SUCCESSFULLY")
+                    // else
+                    //   console.log("INSERT NOTIFICATION IN CREATING EVENT FAILED")
                     return res.status(200).json({
                       message: "Your event has been created successfully",
                       event_id: event_id
@@ -92,13 +99,13 @@ module.exports = {
         let sql = "select organizer_id from organizer where organizer_id = ?"
         let values = [[req.userData.id]]
         db.query(sql, [values], function (err, result) {
-          if (result.length === 0) {
-            return res.status(404).json({
-              error: "Cannot find the organizer",
-            });
-          } else if (err) {
+          if (err) {
             return res.status(500).json({
               error: "There is something wrong when querying",
+            });
+          } else if (result.length === 0) {
+            return res.status(404).json({
+              error: "Cannot find the organizer",
             });
           } else {
             let val = {
@@ -143,13 +150,13 @@ module.exports = {
         let sql = "select organizer_id from organizer where organizer_id = ?"
         let values = [[req.userData.id]]
         db.query(sql, [values], function (err, result) {
-          if (result.length === 0) {
-            return res.status(404).json({
-              error: "Cannot find the organizer",
-            });
-          } else if (err) {
+          if (err) {
             return res.status(500).json({
               error: "There is something wrong when querying",
+            });
+          } else if (result.length === 0) {
+            return res.status(404).json({
+              error: "Cannot find the organizer",
             });
           } else {
             let sql = "delete from event where event_id in (?)"
