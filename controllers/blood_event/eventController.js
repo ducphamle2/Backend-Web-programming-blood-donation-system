@@ -3,8 +3,6 @@ const eventId = require("../../utils/utils").generateId
 const utils = require("../../utils/utils")
 const constants = require("../../utils/constants")
 const { validationResult } = require("express-validator/check");
-const io = require('../socket/socket.js').getIo();
-const notificationController = require("../notification/notificationController")
 
 module.exports = {
   createEvent: (req, res) => {
@@ -67,13 +65,6 @@ module.exports = {
                       error: "Error querying: " + err,
                     });
                   } else {
-                    let result = notificationController.createNotification(constants.role.organizer, req.userData.id, req.body.noti_content)
-                    if (result) {
-                      console.log("INSERT NEW NOTIFICATION IN CREATING EVENT SUCCESSFULLY")
-                      io.emit("create_event", "new event created")
-                    }
-                    else
-                      console.log("INSERT NOTIFICATION IN CREATING EVENT FAILED")
                     return res.status(200).json({
                       message: "Your event has been created successfully",
                       event_id: event_id
@@ -227,9 +218,25 @@ module.exports = {
   },
   // needs to use limit and offset (pagnitation here)
   getAllEvents: (req, res) => {
-    db.query("select * from event", function (err, result) {
+    let offset = null
+    let limit = null
+    console.log("REQ ")
+    if (req.query.offset === '' && req.query.limit === '') {
+      offset = 0
+      limit = 3
+    } else {
+      offset = parseInt(req.query.offset)
+      limit = parseInt(req.query.limit)
+    }
+    console.log("OFFSET IN GET ALL EVENTS: ", offset)
+    let query = "select * from event LIMIT ?, ?"
+    console.log("QUERY GET ALL EVENTS: ", query)
+    db.query(query, [offset, limit], function (err, result) {
       if (err) {
-        return res.status(500).json({ error: "there is something wrong with the database" })
+        console.log("ERROR ????????????????????????????", err)
+        return res.status(500).json({
+          error: err
+        })
       } else {
         return res.status(200).json({ message: "success", data: result })
       }
@@ -241,7 +248,6 @@ module.exports = {
         console.log("ERROR: ", err)
         return res.status(500).json({ error: "there is something wrong with the database" })
       } else {
-        //io.to("ABCD").emit("test", "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         if (result[0].red_cross_name === null)
           result[0].red_cross_name = "None"
         return res.status(200).json({ message: "success", data: result[0] })

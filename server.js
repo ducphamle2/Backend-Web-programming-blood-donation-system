@@ -4,13 +4,6 @@ const expressWinston = require("express-winston");
 
 const server = express();
 const http = require("http").Server(server);
-// const io = require('./controllers/socket/socket.js').init(http);
-
-// io.on("connection", (socket) => {
-//   socket.on("join-room", (userId) => {
-//     socket.join(userId);
-//   });
-// });
 
 require("dotenv").config();
 
