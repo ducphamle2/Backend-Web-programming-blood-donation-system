@@ -403,6 +403,35 @@ module.exports = {
       }
     }
   },
+  getstoredbloodDonation: (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    } else {
+      console.log("request user data: ", req.userData);
+      // only organizer can create event
+      if (req.userData.role !== constants.role.red_cross) {
+        return res.status(403).json({
+          error: "Forbidden !! You are not allowed to call this function",
+        });
+      } else {
+        let sql =
+          "select b.*,d.name as donor_name from blood b, donor d where b.donor_id=d.donor_id and status = ?";
+        let values = [[constants.stored]];
+        db.query(sql, [values], function (err, result) {
+          if (err)
+            return res.status(500).json({
+              err: err,
+            });
+          else
+            return res.status(200).json({
+              message: "Fetched stored blood donation",
+              data: result,
+            });
+        });
+      }
+    }
+  },
   getUntestedBloodDonation: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

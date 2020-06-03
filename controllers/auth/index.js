@@ -28,6 +28,11 @@ router.post("/update", [
     check("name").isLength({ min: 5, max: 99 }),
 ], authMiddleware, controller.updateUserProfile);
 
-router.get("/", authMiddleware, controller.getUser)
+router.get("/", authMiddleware, controller.getUser);
+router.post("/change_password", [
+    check("password").exists(),
+    check("new_password").exists(),
+    check("confirm_password").exists(),
+], authMiddleware, controller.updatePassword);
 
 module.exports = router;
