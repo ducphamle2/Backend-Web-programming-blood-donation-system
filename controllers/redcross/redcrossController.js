@@ -307,29 +307,7 @@ module.exports = {
                     return res.status(500).json({
                       err: err,
                     });
-                  else {
-                    let sql =
-                      "update blood set ? where status = ? and blood_id = ?";
-                    let values = [
-                      {
-                        status: constants.stored,
-                        amount: constants.standard_blood_donation_amount,
-                      },
-                      constants.active,
-                      req.params.id,
-                    ];
-                    db.query(sql, values, function (err, resp2) {
-                      if (err)
-                        return res.status(500).json({
-                          err: err,
-                        });
-                      else
-                        return res.status(200).json({
-                          message: "stored blood",
-                          data: resp2,
-                        });
-                    });
-                  }
+                  else return store(req, res);
                 });
               } else {
                 let sql =
@@ -344,29 +322,7 @@ module.exports = {
                     return res.status(500).json({
                       err: err,
                     });
-                  else {
-                    let sql =
-                      "update blood set ? where status = ? and blood_id = ?";
-                    let values = [
-                      {
-                        status: constants.stored,
-                        amount: constants.standard_blood_donation_amount,
-                      },
-                      constants.active,
-                      req.params.id,
-                    ];
-                    db.query(sql, values, function (err, resp2) {
-                      if (err)
-                        return res.status(500).json({
-                          err: err,
-                        });
-                      else
-                        return res.status(200).json({
-                          message: "stored blood",
-                          data: resp2,
-                        });
-                    });
-                  }
+                  else return store(req, res);
                 });
               }
             });
@@ -727,13 +683,8 @@ module.exports = {
         });
       } else {
         let sql =
-          "update blood set status = ? where (status = ? or status = ?) and blood_id = ?";
-        let values = [
-          constants.rejected,
-          constants.pending,
-          constants.active,
-          req.params.id,
-        ];
+          "update blood set status = ? where status = ? and blood_id = ?";
+        let values = [constants.rejected, constants.approved, req.params.id];
         db.query(sql, values, function (err, result) {
           if (err)
             return res.status(500).json({
@@ -892,11 +843,12 @@ module.exports = {
                     return res.status(500).json({
                       err: err,
                     });
-                  else
+                  else {
                     return res.status(200).json({
-                      message: "tested blood",
-                      data: result,
+                      message: "tested and stored blood",
+                      data: resp2,
                     });
+                  }
                 });
               }
             });
