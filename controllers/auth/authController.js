@@ -224,13 +224,18 @@ module.exports = {
                             height: req.body.height ? req.body.height : null,
                             weight: req.body.weight ? req.body.weight : null,
                             gender: req.body.gender ? req.body.gender : null,
-
-                            tattoo_last_12_month: req.body.tattoo_last_12_month !== null ? parseInt(req.body.tattoo_last_12_month) : null,
-                            cholesterol: req.body.cholesterol !== null ? parseInt(req.body.cholesterol) : null,
-                            positive_test_HIV: req.body.positive_test_HIV !== null ? parseInt(req.body.positive_test_HIV) : null,
-                            infectious_disease: req.body.infectious_disease !== null ? parseInt(req.body.infectious_disease) : null,
-                            cancer: req.body.cancer !== null ? parseInt(req.body.cancer) : null,
                         };
+
+                        //ADDITIONAL ATTRIBUTE FOR DONATING BLOOD
+                        let attributeArr = [
+                            "tattoo_last_12_month",
+                            "cholesterol",
+                            "positive_test_HIV",
+                            "infectious_disease",
+                            "cancer"
+                        ];
+
+                        attributeArr.forEach((item) => { if (req.body[item] === 1 || req.body[item] === 0) val[item] = req.body[item]});
 
                         //UPDATE SQL
                         db.query(
