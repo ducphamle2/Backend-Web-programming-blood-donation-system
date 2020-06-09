@@ -84,9 +84,8 @@ module.exports = {
           error: "Forbidden !! You are not allowed to call this function",
         });
       } else {
-        let sql = "select * from event where status=?";
-        let values = [[constants.approved]];
-        db.query(sql, [values], function (err, result) {
+        let sql = "select * from event";
+        db.query(sql, function (err, result) {
           if (err)
             return res.status(500).json({
               err: "There is something wrong when querying",
@@ -372,9 +371,9 @@ module.exports = {
         });
       } else {
         let sql =
-          "select b.*,d.name as donor_name from blood b, donor d where b.donor_id=d.donor_id and status = ?";
-        let values = [[constants.stored]];
-        db.query(sql, [values], function (err, result) {
+          "select b.*,d.name as donor_name,d.blood_type,e.name as event_name from blood b, donor d, event e where b.donor_id=d.donor_id and b.event_id=e.event_id";
+        db.query(sql, function (err, result) {
+          console.log("result", result);
           if (err)
             return res.status(500).json({
               err: err,
@@ -429,7 +428,7 @@ module.exports = {
         });
       } else {
         let sql =
-          "select bloodType,amount from blood_store where red_cross_id = ?";
+          "select d.blood_type,sum(b.amount) from blood b,donor d where b.donor_id=d.donor_id and red_cross_id = ? group by d.blood_type";
         let values = [[req.userData.id]];
         db.query(sql, values, function (err, result) {
           console.log(result);
@@ -524,9 +523,8 @@ module.exports = {
               err: err,
             });
           else {
-            console.log("blood_type", resp);
             let sql =
-              "select amount from blood_store where red_cross_id = ? and bloodType = ?";
+              "select sum(amount) as amount from blood where red_cross_id = ? and blood_type = ? group by blood_type";
             let values = [req.userData.id, resp[0].blood_type];
             db.query(sql, values, function (err, result) {
               if (err)
@@ -543,39 +541,13 @@ module.exports = {
                 console.log(subAmount);
                 if (subAmount <= 0)
                   return res.status(500).json({
-                    err: "not enough blood",
+                    err: "not enough blood of this type",
                   });
-                else {
-                  let sql =
-                    "update blood_store set amount=? where red_cross_id = ? and bloodType = ?";
-                  let values = [subAmount, req.userData.id, resp[0].blood_type];
-                  db.query(sql, values, function (err, result) {
-                    if (err)
-                      return res.status(500).json({
-                        err: err,
-                      });
-                    else {
-                      let sql =
-                        "update blood_order set status = ? where status = ? and order_id = ?";
-                      let values = [
-                        constants.approved,
-                        constants.pending,
-                        req.params.id,
-                      ];
-                      db.query(sql, values, function (err, result) {
-                        if (err)
-                          return res.status(500).json({
-                            err: err,
-                          });
-                        else
-                          return res.status(200).json({
-                            message: "approved order",
-                            data: result,
-                          });
-                      });
-                    }
+                else
+                  return res.status(200).json({
+                    message: "approved order",
+                    data: result,
                   });
-                }
               }
             });
           }
@@ -583,6 +555,37 @@ module.exports = {
       }
     }
   },
+  // let sql =
+  //   "update blood set status=?,order_id=? where red_cross_id = ? and blood_type = ? and status = ? order by donate_date limit ?";
+  // let values = [
+  //   constants.active,
+  //   req.params.id,
+  //   req.userData.id,
+  //   resp[0].blood_type,
+  //   constants.stored,
+  //   Math.ceil(
+  //     resp[0].amount / constants.standard_blood_donation_amount
+  //   ),
+  // ];
+  // db.query(sql, values, function (err, result) {
+  //   if (err)
+  //     return res.status(500).json({
+  //       err: err,
+  //     });
+  //   else {
+  //     let sql =
+  //       "update blood_order set status = ? where status = ? and order_id = ?";
+  //     let values = [
+  //       constants.approved,
+  //       constants.pending,
+  //       req.params.id,
+  //     ];
+  //     db.query(sql, values, function (err, result) {
+  //       if (err)
+  //         return res.status(500).json({
+  //           err: err,
+  //         });
+  //       else
   acceptEvents: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -798,12 +801,12 @@ module.exports = {
                 });
               else if (resp1[0].blood_type === null) {
                 let sql =
-                  "update blood set status = ?,blood_type = ? where status = ? and blood_id = ?";
+                  "update blood set status = ?,red_cross_id = ? where status = ? and blood_id = ?";
                 let blood_type_array = ["A", "B", "O", "Rh", "AB"];
                 let index = Math.floor(Math.random() * blood_type_array.length);
                 let values = [
-                  constants.active,
-                  blood_type_array[index],
+                  constants.stored,
+                  req.userData.id,
                   constants.approved,
                   req.params.id,
                 ];
@@ -831,10 +834,10 @@ module.exports = {
                 });
               } else {
                 let sql =
-                  "update blood set status = ?,blood_type = ? where status = ? and blood_id = ?";
+                  "update blood set status = ?,red_cross_id = ? where status = ? and blood_id = ?";
                 let values = [
-                  constants.active,
-                  resp1[0].blood_type,
+                  constants.stored,
+                  req.userData.id,
                   constants.approved,
                   req.params.id,
                 ];
