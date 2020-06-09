@@ -218,12 +218,6 @@ module.exports = {
                         let val = {
                             name: req.body.name,
                             email: req.body.email,
-                            address: req.body.address ? req.body.address : "",
-                            dob: req.body.dob ? req.body.dob : 0,
-
-                            height: req.body.height ? req.body.height : null,
-                            weight: req.body.weight ? req.body.weight : null,
-                            gender: req.body.gender ? req.body.gender : null,
                         };
 
                         //ADDITIONAL ATTRIBUTE FOR DONATING BLOOD
@@ -234,8 +228,16 @@ module.exports = {
                             "infectious_disease",
                             "cancer"
                         ];
-
                         attributeArr.forEach((item) => { if (req.body[item] === 1 || req.body[item] === 0) val[item] = req.body[item]});
+
+                        attributeArr = [
+                            "height",
+                            "weight",
+                            "gender",
+                            "address",
+                            "dob"
+                        ];
+                        attributeArr.forEach((item) => { if (req.body[item] || req.body[item] === 0) val[item] = req.body[item] });
 
                         //UPDATE SQL
                         db.query(
