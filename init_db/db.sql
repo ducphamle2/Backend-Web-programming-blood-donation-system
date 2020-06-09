@@ -5,13 +5,24 @@ GRANT ALL PRIVILEGES ON *.* TO 'user'@'localhost' IDENTIFIED BY 'password';
 create database mydb;
 USE mydb;
 CREATE TABLE donor (
-  donor_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL, 
-  name                  VARCHAR(99)                   NOT NULL,
-  password              VARCHAR(100)                  NOT NULL, 
-  email                 VARCHAR(30)                   NOT NULL, 
-  address               VARCHAR(50)                   NULL,
-  blood_type            VARCHAR(5)                    NULL, 
-  dob                   INT(11)                      NULL
+  donor_id              CHAR(32) PRIMARY KEY UNIQUE         NOT NULL,
+  name                  VARCHAR(99)                         NOT NULL,
+  password              VARCHAR(100)                        NOT NULL,
+  email                 VARCHAR(30)                         NOT NULL,
+  address               VARCHAR(50)                         NULL,
+  blood_type            VARCHAR(5)                          NULL,
+  dob                   INT(11)                             NULL,
+
+  /*ADDITIONAL DATA, ONE OF THEM NULL RESULT IN NOT BEING ABLE TO CREATE BLOOD DONATION FORM*/
+  height                INT(11)                             NULL,
+  weight                INT(11)                             NULL,
+  gender                VARCHAR(30)                         NULL,
+
+  tattoo_last_12_month  INT(1)                              NULL,
+  cholesterol           INT(1)                              NULL,
+  positive_test_HIV     INT(1)                              NULL,
+  infectious_disease    INT(1)                              NULL,
+  cancer                INT(1)                              NULL
 )
   ENGINE = INNODB
   DEFAULT CHARACTER SET = utf8;

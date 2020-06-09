@@ -220,6 +220,16 @@ module.exports = {
                             email: req.body.email,
                             address: req.body.address ? req.body.address : "",
                             dob: req.body.dob ? req.body.dob : 0,
+
+                            height: req.body.height ? req.body.height : null,
+                            weight: req.body.weight ? req.body.weight : null,
+                            gender: req.body.gender ? req.body.gender : null,
+
+                            tattoo_last_12_month: req.body.tattoo_last_12_month !== null ? parseInt(req.body.tattoo_last_12_month) : null,
+                            cholesterol: req.body.cholesterol !== null ? parseInt(req.body.cholesterol) : null,
+                            positive_test_HIV: req.body.positive_test_HIV !== null ? parseInt(req.body.positive_test_HIV) : null,
+                            infectious_disease: req.body.infectious_disease !== null ? parseInt(req.body.infectious_disease) : null,
+                            cancer: req.body.cancer !== null ? parseInt(req.body.cancer) : null,
                         };
 
                         //UPDATE SQL
