@@ -400,7 +400,7 @@ module.exports = {
         });
       } else {
         let sql = "select * from blood where status = ?";
-        let values = [[constants.approved]];
+        let values = [[constants.pending]];
         db.query(sql, [values], function (err, result) {
           if (err)
             return res.status(500).json({
@@ -807,7 +807,7 @@ module.exports = {
                 let values = [
                   constants.stored,
                   req.userData.id,
-                  constants.approved,
+                  constants.pending,
                   req.params.id,
                 ];
                 db.query(sql, values, function (err, result) {
@@ -838,7 +838,7 @@ module.exports = {
                 let values = [
                   constants.stored,
                   req.userData.id,
-                  constants.approved,
+                  constants.pending,
                   req.params.id,
                 ];
                 db.query(sql, values, function (err, result) {
@@ -849,7 +849,7 @@ module.exports = {
                   else {
                     return res.status(200).json({
                       message: "tested and stored blood",
-                      data: resp2,
+                      data: result,
                     });
                   }
                 });
