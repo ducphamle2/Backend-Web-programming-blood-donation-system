@@ -7,26 +7,24 @@ const { check } = require("express-validator/check");
 const router = express.Router();
 
 router.post("/create_order", authMiddleware, [
-    check("date").matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
+    check("date").isInt(),
 
 ],
     controller.createOrder);
 
 router.post("/update_order_info/:id", [
     check("id").isLength({ min: 32, max: 32 }),
-    check("date").exists().
-        matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
+    check("date").isInt(),
 ],
     authMiddleware,
     controller.updateOrderInfo);
 
-router.post("/update_order_status/:id", [
-    check("id").isLength({ min: 32, max: 32 }),
-    check("date").exists().
-        matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
-],
-    authMiddleware,
-    controller.updateOrderStatus);
+// router.post("/update_order_status/:id", [
+//     check("id").isLength({ min: 32, max: 32 }),
+//     check("date").isInt(),
+// ],
+//     authMiddleware,
+//     controller.updateOrderStatus);
 
 router.delete("/delete_order/:id", authMiddleware, [
     check("id").isLength({ min: 32, max: 32 }),
@@ -34,10 +32,18 @@ router.delete("/delete_order/:id", authMiddleware, [
     controller.deleteOrder);
 
 router.post("/search_with_date",
-    check("date").
-        matches(/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9])(?:( [0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/, "i"),
+    check("date").isInt(),
     controller.searchOrderWithDate);
 
-router.get("/get_orders", controller.getAllOrders)
+router.post("/send_order/:id", [
+    check("id").isLength({ min: 32, max: 32 }),
+],
+    authMiddleware,
+    controller.sendOrder);
+
+router.get("/get_orders", authMiddleware, controller.getAllOrders)
+router.get("/get_sent_orders", authMiddleware, controller.getAllSentOrders)
+router.get("/get_unsent_orders", authMiddleware, controller.getAllUnsentOrders)
+router.get("/get_order/:id", authMiddleware, controller.getOrderWithID)
 
 module.exports = router;
