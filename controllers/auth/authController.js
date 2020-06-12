@@ -218,9 +218,26 @@ module.exports = {
                         let val = {
                             name: req.body.name,
                             email: req.body.email,
-                            address: req.body.address ? req.body.address : "",
-                            dob: req.body.dob ? req.body.dob : 0,
                         };
+
+                        //ADDITIONAL ATTRIBUTE FOR DONATING BLOOD
+                        let attributeArr = [
+                            "tattoo_last_12_month",
+                            "cholesterol",
+                            "positive_test_HIV",
+                            "infectious_disease",
+                            "cancer"
+                        ];
+                        attributeArr.forEach((item) => { if (req.body[item] === 1 || req.body[item] === 0) val[item] = req.body[item]});
+
+                        attributeArr = [
+                            "height",
+                            "weight",
+                            "gender",
+                            "address",
+                            "dob"
+                        ];
+                        attributeArr.forEach((item) => { if (req.body[item] || req.body[item] === 0) val[item] = req.body[item] });
 
                         //UPDATE SQL
                         db.query(
