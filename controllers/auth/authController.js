@@ -1,4 +1,3 @@
-const winston = require("winston");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator/check");
@@ -11,20 +10,10 @@ const generateHash = (password) => {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
 
-const logger = winston.createLogger({
-    transports: [new winston.transports.Console()],
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-        winston.format.colorize()
-    ),
-});
-
 module.exports = {
     login: (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            logger.error(`Validation error: ${JSON.stringify(errors.array())}`);
             return res.status(422).json({ error: errors.array() });
         } else {
             if (!utils.checkRole(req.body.role)) {
@@ -52,7 +41,6 @@ module.exports = {
                         res.status(422).json({
                             error: "Auth failed!",
                         });
-                        logger.info("Wrong password");
                     } else {
                         // generate a token for the account to use in other api
                         jwt.sign(
@@ -218,9 +206,26 @@ module.exports = {
                         let val = {
                             name: req.body.name,
                             email: req.body.email,
-                            address: req.body.address ? req.body.address : "",
-                            dob: req.body.dob ? req.body.dob : 0,
                         };
+
+                        //ADDITIONAL ATTRIBUTE FOR DONATING BLOOD
+                        let attributeArr = [
+                            "tattoo_last_12_month",
+                            "cholesterol",
+                            "positive_test_HIV",
+                            "infectious_disease",
+                            "cancer"
+                        ];
+                        attributeArr.forEach((item) => { if (req.body[item] === 1 || req.body[item] === 0) val[item] = req.body[item] });
+
+                        attributeArr = [
+                            "height",
+                            "weight",
+                            "gender",
+                            "address",
+                            "dob"
+                        ];
+                        attributeArr.forEach((item) => { if (req.body[item] || req.body[item] === 0) val[item] = req.body[item] });
 
                         //UPDATE SQL
                         db.query(

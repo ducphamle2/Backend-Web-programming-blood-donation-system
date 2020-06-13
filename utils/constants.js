@@ -1,5 +1,6 @@
 module.exports = {
   pending: "pending",
+  unsent: "unsent",
   approved: "approved",
   rejected: "rejected",
   stored: "stored",
