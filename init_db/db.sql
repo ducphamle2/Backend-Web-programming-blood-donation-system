@@ -74,13 +74,11 @@ CREATE TABLE event (
 CREATE TABLE blood_order (
   order_id              CHAR(32) PRIMARY KEY UNIQUE   NOT NULL,
   hospital_id           CHAR(32)                      NOT NULL, 
-  red_cross_id          CHAR(32)                      NULL, 
-  order_date            DATETIME                      NOT NULL,
+  order_date            INT(11)                      NOT NULL,
   amount                DOUBLE PRECISION              NULL, 
   blood_type            VARCHAR(5)                    NULL, 
   status                VARCHAR(10)                   NULL,
-  FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id), 
-  FOREIGN KEY (red_cross_id) REFERENCES red_cross(red_cross_id)
+  FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id)
 )
   ENGINE = INNODB
   DEFAULT CHARACTER SET = utf8;
