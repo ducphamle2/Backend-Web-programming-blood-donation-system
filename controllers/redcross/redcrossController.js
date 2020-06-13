@@ -30,12 +30,12 @@ module.exports = {
           error: "Forbidden !! You are not allowed to call this function",
         });
       } else {
-        let sql = "select * from order where status=?";
-        let values = [[constants.approved]];
-        db.query(sql, [values], function (err, result) {
+        let sql =
+          "select o.*,h.name as hospital_name from blood_order o, hospital h where o.hospital_id=h.hospital_id";
+        db.query(sql, function (err, result) {
           if (err)
             return res.status(500).json({
-              err: "There is something wrong when querying",
+              err: err,
             });
           else
             return res.status(200).json({
@@ -428,8 +428,8 @@ module.exports = {
         });
       } else {
         let sql =
-          "select d.blood_type,sum(b.amount) from blood b,donor d where b.donor_id=d.donor_id and red_cross_id = ? group by d.blood_type";
-        let values = [[req.userData.id]];
+          "select d.blood_type,sum(b.amount) from blood b,donor d where b.donor_id=d.donor_id and red_cross_id = ? and b.status = ? group by d.blood_type";
+        let values = [req.userData.id, constants.stored];
         db.query(sql, values, function (err, result) {
           console.log(result);
           if (err)
@@ -487,7 +487,7 @@ module.exports = {
       } else {
         let sql =
           "select h.name,o.* from blood_order o, hospital h where o.hospital_id=h.hospital_id and o.status=?";
-        let values = [[constants.pending]];
+        let values = [constants.pending];
         db.query(sql, [values], function (err, result) {
           if (err)
             return res.status(500).json({
@@ -502,7 +502,7 @@ module.exports = {
       }
     }
   },
-  acceptOrders: (req, res) => {
+  acceptOrders: (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -524,30 +524,82 @@ module.exports = {
             });
           else {
             let sql =
-              "select sum(amount) as amount from blood where red_cross_id = ? and blood_type = ? group by blood_type";
-            let values = [req.userData.id, resp[0].blood_type];
+              "select sum(b.amount) as amount from blood b, donor d where b.donor_id=d.donor_id and b.red_cross_id = ? and d.blood_type = ? and b.status = ? group by d.blood_type";
+            let values = [
+              req.userData.id,
+              resp[0].blood_type,
+              constants.stored,
+            ];
             db.query(sql, values, function (err, result) {
-              if (err)
+              if (err) {
+                console.log("err", err);
                 return res.status(500).json({
                   err: err,
                 });
-              else {
+              } else {
                 console.log("blood_type", result);
-                if (result.length === 0)
+                if (result.length === 0) {
                   return res.status(500).json({
-                    err: "there is no blood of type " + resp[0].blood_type,
+                    err:
+                      "there is no blood of type " +
+                      resp[0].blood_type +
+                      " in store",
                   });
+                }
                 let subAmount = result[0].amount - resp[0].amount;
-                console.log(subAmount);
-                if (subAmount <= 0)
+                if (subAmount < 0)
                   return res.status(500).json({
                     err: "not enough blood of this type",
                   });
-                else
-                  return res.status(200).json({
-                    message: "approved order",
-                    data: result,
+                else {
+                  // let sql =
+                  //   "select b.*,d.name as donor_name,e.name as event_name,e.location,e.event_date from blood b,donor d,event e where b.donor_id = d.donor_id and b.event_id=e.event_id and b.red_cross_id = ? and d.blood_type = ? and b.status = ? order by donate_date";
+                  // let values = [
+                  //   req.userData.id,
+                  //   resp[0].blood_type,
+                  //   constants.stored,
+                  // ];
+                  // db.query(sql, values, function (err, result) {
+                  //   if (err)
+                  //     return res.status(500).json({
+                  //       err: err,
+                  //     });
+                  //   else {
+                  //     return res.status(200).json({
+                  //       message: "Accepted Order",
+                  //       data: result,
+                  //       number: Math.ceil(
+                  //         req.body.amount /
+                  //           constants.standard_blood_donation_amount
+                  //       ),
+                  //     });
+                  //   }
+                  // });
+                  let sql =
+                    "update blood_order set status=?,red_cross_id=? where order_id=?";
+                  let values = [
+                    constants.approved,
+                    req.userData.id,
+                    req.params.id,
+                  ];
+                  db.query(sql, values, function (err, resp2) {
+                    if (err)
+                      return res.status(500).json({
+                        err: err,
+                      });
+                    else {
+                      if (process.env.ENVIRONMENT !== "PRODUCTION") {
+                        req.amount = resp[0].amount;
+                        req.blood_type = resp[0].blood_type;
+                        next();
+                      } else
+                        return res.status(200).json({
+                          message: "Accepted Order",
+                          data: result,
+                        });
+                    }
                   });
+                }
               }
             });
           }
@@ -586,6 +638,41 @@ module.exports = {
   //           err: err,
   //         });
   //       else
+  issueDonation(req, res) {
+    let sql =
+      "update blood set status = ?,order_id = ? where red_cross_id = ? and blood_id = ? and status = ?";
+
+    let values = [
+      constants.active,
+      req.params.id,
+      req.userData.id,
+      req.blood_id,
+      constants.stored,
+    ];
+    // let sql =
+    //   "select blood_id from blood where red_cross_id = ? and donor_id in (select donor_id from donor where blood_type = ?) and status = ? order by donate_date limit ?";
+
+    // let values = [
+    //   constants.active,
+    //   req.params.id,
+    //   req.userData.id,
+    //   resp[0].blood_type,
+    //   constants.stored,
+    //   Math.ceil(req.body.amount / constants.standard_blood_donation_amount),
+    // ];
+    db.query(sql, values, function (err, result) {
+      if (err)
+        return res.status(500).json({
+          err: err,
+        });
+      else {
+        return res.status(200).json({
+          message: "Accepted Order",
+          data: result,
+        });
+      }
+    });
+  },
   acceptEvents: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -802,8 +889,6 @@ module.exports = {
               else if (resp1[0].blood_type === null) {
                 let sql =
                   "update blood set status = ?,red_cross_id = ? where status = ? and blood_id = ?";
-                let blood_type_array = ["A", "B", "O", "Rh", "AB"];
-                let index = Math.floor(Math.random() * blood_type_array.length);
                 let values = [
                   constants.stored,
                   req.userData.id,
@@ -818,7 +903,7 @@ module.exports = {
                   else {
                     let sql =
                       "update donor set blood_type = ? where donor_id = ?";
-                    let values = [blood_type_array[index], resp[0].donor_id];
+                    let values = [req.blood_type, resp[0].donor_id];
                     db.query(sql, values, function (err, resp1) {
                       if (err)
                         return res.status(500).json({
@@ -854,6 +939,36 @@ module.exports = {
                   }
                 });
               }
+            });
+          }
+        });
+      }
+    }
+  },
+  viewDonationList(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    } else {
+      console.log("request user data: ", req.userData);
+      // only organizer can create event
+      if (req.userData.role !== constants.role.red_cross) {
+        return res.status(403).json({
+          error: "Forbidden !! You are not allowed to call this function",
+        });
+      } else {
+        let sql =
+          "select b.*,d.name from blood b,donor d where b.donor_id=d.donor_id and b.red_cross_id = ? and b.order_id = ? and b.status = ? order by b.donate_date";
+        let values = [req.userData.id, req.params.id, constants.active];
+        db.query(sql, values, function (err, result) {
+          if (err)
+            return res.status(500).json({
+              err: err,
+            });
+          else {
+            return res.status(200).json({
+              message: "issued donations",
+              data: result,
             });
           }
         });

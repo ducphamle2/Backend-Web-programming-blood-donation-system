@@ -3,18 +3,21 @@ const express = require("express");
 const controller = require("./redcrossController");
 const authMiddleware = require("../../middlewares/authMiddleware.js");
 const { check } = require("express-validator/check");
+const bloodtypeMiddleware = require("../../middlewares/bloodtypeMiddleware");
+const DonationSelectMiddleware = require("../../middlewares/DonationSelectMiddleware");
 
 const router = express.Router();
 
-router.get("/getpendingOrders", controller.getpendingOrders);
+router.get("/getpendingOrders", authMiddleware, controller.getpendingOrders);
 
 router.put(
   "/acceptedorder/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
-  controller.acceptOrders
+  function (req, res, next) {
+    DonationSelectMiddleware(req, res, next, controller.issueDonation);
+  }
 );
-
 router.put(
   "/rejectorder/:id",
   check("id").isLength({ min: 32, max: 32 }),
@@ -77,5 +80,19 @@ router.post(
   check("id").isLength({ min: 32, max: 32 }),
   controller.bannedAccount
 );
-router.post("/testBlood/:id", authMiddleware, controller.testBlood);
+router.post(
+  "/testBlood/:id",
+  authMiddleware,
+  function (req, res, next) {
+    if (process.env.ENVIRONMENT !== "PRODUCTION")
+      bloodtypeMiddleware(req, res, next);
+    else next();
+  },
+  controller.testBlood
+);
+router.get(
+  "/viewDonationList/:id",
+  authMiddleware,
+  controller.viewDonationList
+);
 module.exports = router;
