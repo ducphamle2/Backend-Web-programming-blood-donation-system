@@ -6,58 +6,58 @@ const { check } = require("express-validator/check");
 
 const router = express.Router();
 
-router.get("/getpendingOrders", controller.getpendingOrders);
+router.get("/get_pending_orders", controller.getPendingOrders);
 
 router.put(
-  "/acceptedorder/:id",
+  "/accepted_order/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.acceptOrders
 );
 
 router.put(
-  "/rejectorder/:id",
+  "/reject_order/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.rejectOrders
 );
-router.get("/getpendingEvents", authMiddleware, controller.getpendingEvents);
-router.get("/getDonors", authMiddleware, controller.getDonors);
-router.get("/getHospitals", authMiddleware, controller.getHospitals);
-router.get("/getOrganizers", authMiddleware, controller.getOrganizers);
+router.get("/get_pending_events", authMiddleware, controller.getPendingEvents);
+router.get("/get_donors", authMiddleware, controller.getDonors);
+router.get("/get_hospitals", authMiddleware, controller.getHospitals);
+router.get("/get_organizers", authMiddleware, controller.getOrganizers);
 router.put(
-  "/acceptedevent/:id",
+  "/accepted_event/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.acceptEvents
 );
 
 router.put(
-  "/rejectevent/:id",
+  "/reject_event/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.rejectEvents
 );
 router.put(
-  "/rejectdonation/:id",
+  "/reject_donation/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.rejectDonation
 );
-router.get("/getstore", authMiddleware, controller.getStore);
-router.get("/getbloodDonation", authMiddleware, controller.getbloodDonation);
+router.get("/get_store", authMiddleware, controller.getStore);
+router.get("/get_blood_donation", authMiddleware, controller.getBloodDonation);
 router.get("/get_approved_events", controller.getAllApprovedEvents);
 router.get(
-  "/getUntestedBloodDonation",
+  "/get_untested_blood_donation",
   authMiddleware,
   controller.getUntestedBloodDonation
 );
-router.get("/getAcceptedEvents", authMiddleware, controller.getacceptedEvents);
-router.get("/getAcceptedOrders", authMiddleware, controller.getacceptedOrders);
+router.get("/get_accepted_events", authMiddleware, controller.getAcceptedEvents);
+router.get("/get_accepted_orders", authMiddleware, controller.getAcceptedOrders);
 router.get(
-  "/getStoredBloodDonations",
+  "/get_stored_blood_donations",
   authMiddleware,
-  controller.getstoredbloodDonation
+  controller.getStoredBloodDonation
 );
 router.post(
   "/store/:id",
@@ -77,5 +77,5 @@ router.post(
   check("id").isLength({ min: 32, max: 32 }),
   controller.bannedAccount
 );
-router.post("/testBlood/:id", authMiddleware, controller.testBlood);
+router.post("/test_blood/:id", authMiddleware, controller.testBlood);
 module.exports = router;

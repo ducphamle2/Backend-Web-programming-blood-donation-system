@@ -19,7 +19,7 @@ module.exports = {
       }
     );
   },
-  getacceptedOrders: (req, res) => {
+  getAcceptedOrders: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -73,7 +73,7 @@ module.exports = {
       }
     }
   },
-  getacceptedEvents: (req, res) => {
+  getAcceptedEvents: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -330,7 +330,7 @@ module.exports = {
       }
     }
   },
-  getbloodDonation: (req, res) => {
+  getBloodDonation: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -358,7 +358,7 @@ module.exports = {
       }
     }
   },
-  getstoredbloodDonation: (req, res) => {
+  getStoredBloodDonation: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -445,7 +445,7 @@ module.exports = {
       }
     }
   },
-  getpendingEvents: (req, res) => {
+  getPendingEvents: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -473,7 +473,7 @@ module.exports = {
       }
     }
   },
-  getpendingOrders: (req, res) => {
+  getPendingOrders: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
