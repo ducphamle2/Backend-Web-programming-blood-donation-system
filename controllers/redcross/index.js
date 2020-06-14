@@ -6,7 +6,7 @@ const { check } = require("express-validator/check");
 
 const router = express.Router();
 
-router.get("/getpendingOrders", controller.getpendingOrders);
+router.get("/getpendingOrders",authMiddleware, controller.getpendingOrders);
 
 router.put(
   "/acceptedorder/:id",

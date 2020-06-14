@@ -30,12 +30,12 @@ module.exports = {
           error: "Forbidden !! You are not allowed to call this function",
         });
       } else {
-        let sql = "select * from order where status=?";
+        let sql = "select * from blood_order where status=?";
         let values = [[constants.approved]];
         db.query(sql, [values], function (err, result) {
           if (err)
             return res.status(500).json({
-              err: "There is something wrong when querying",
+              err: err,
             });
           else
             return res.status(200).json({
