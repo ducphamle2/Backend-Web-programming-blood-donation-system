@@ -1,14 +1,15 @@
 version: '3'
 services:
     node:
-        build:
-            context: .
+        image: node
         ports:
             - 8080:8080
+        working_dir: /app
         volumes:
             - ./:/app
             - /app/node_modules
         env_file: .env
+        command: bash -c "npm install && npm install -g nodemon && nodemon server.js"
         depends_on:
             - mysql
     mysql:
