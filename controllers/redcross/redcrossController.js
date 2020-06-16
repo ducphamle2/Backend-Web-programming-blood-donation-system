@@ -907,29 +907,6 @@ module.exports = {
                     err: "not enough blood of this type",
                   });
                 else {
-                  // let sql =
-                  //   "select b.*,d.name as donor_name,e.name as event_name,e.location,e.event_date from blood b,donor d,event e where b.donor_id = d.donor_id and b.event_id=e.event_id and b.red_cross_id = ? and d.blood_type = ? and b.status = ? order by donate_date";
-                  // let values = [
-                  //   req.userData.id,
-                  //   resp[0].blood_type,
-                  //   constants.stored,
-                  // ];
-                  // db.query(sql, values, function (err, result) {
-                  //   if (err)
-                  //     return res.status(500).json({
-                  //       err: err,
-                  //     });
-                  //   else {
-                  //     return res.status(200).json({
-                  //       message: "Accepted Order",
-                  //       data: result,
-                  //       number: Math.ceil(
-                  //         req.body.amount /
-                  //           constants.standard_blood_donation_amount
-                  //       ),
-                  //     });
-                  //   }
-                  // });
                   let sql = "update blood_order set status=? where order_id=?";
                   let values = [constants.approved, req.params.id];
                   db.query(sql, values, function (err, resp2) {
@@ -938,15 +915,51 @@ module.exports = {
                         err: err,
                       });
                     else {
-                      if (process.env.ENVIRONMENT !== "PRODUCTION") {
-                        req.amount = resp[0].amount;
-                        req.blood_type = resp[0].blood_type;
-                        next();
-                      } else
-                        return res.status(200).json({
-                          message: "Accepted Order",
-                          data: result,
-                        });
+                      let sql =
+                        "select blood_id from blood where red_cross_id = ? and donor_id in (select donor_id from donor where blood_type = ?) and status = ? order by donate_date limit ?";
+
+                      let values = [
+                        req.userData.id,
+                        resp[0].blood_type,
+                        constants.stored,
+                        Math.ceil(
+                          resp[0].amount /
+                            constants.standard_blood_donation_amount
+                        ),
+                      ];
+                      db.query(sql, values, function (err, result) {
+                        if (err)
+                          return res.status(500).json({
+                            err: err,
+                          });
+                        else {
+                          const respBlood = [];
+                          result.forEach((element) => {
+                            const blood_id_params = element.blood_id;
+                            let sql =
+                              "update blood set status = ?,order_id = ? where red_cross_id = ? and blood_id = ? and status = ?";
+
+                            let values = [
+                              constants.active,
+                              req.params.id,
+                              req.userData.id,
+                              blood_id_params,
+                              constants.stored,
+                            ];
+                            db.query(sql, values, function (err, result) {
+                              if (err)
+                                return res.status(500).json({
+                                  err: err,
+                                });
+                              else respBlood.push(result); //result.affectedrow
+                            });
+                          });
+                          return res.status(200).json({
+                            message: "Accepted Order",
+                            data: respBlood,
+                          });
+                        }
+                      });
                     }
                   });
                 }
@@ -999,17 +1012,6 @@ module.exports = {
       req.blood_id || blood_id_params,
       constants.stored,
     ];
-    // let sql =
-    //   "select blood_id from blood where red_cross_id = ? and donor_id in (select donor_id from donor where blood_type = ?) and status = ? order by donate_date limit ?";
-
-    // let values = [
-    //   constants.active,
-    //   req.params.id,
-    //   req.userData.id,
-    //   resp[0].blood_type,
-    //   constants.stored,
-    //   Math.ceil(req.body.amount / constants.standard_blood_donation_amount),
-    // ];
     db.query(sql, values, function (err, result) {
       if (err)
         return res.status(500).json({
@@ -1253,7 +1255,7 @@ module.exports = {
                   else {
                     let sql =
                       "update donor set blood_type = ? where donor_id = ?";
-                    let values = [req.blood_type, resp[0].donor_id];
+                    let values = ["A+", resp[0].donor_id];
                     db.query(sql, values, function (err, resp1) {
                       if (err)
                         return res.status(500).json({

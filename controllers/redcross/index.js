@@ -114,16 +114,7 @@ router.post(
   check("id").isLength({ min: 32, max: 32 }),
   controller.bannedAccount
 );
-router.post(
-  "/test_blood/:id",
-  authMiddleware,
-  function (req, res, next) {
-    if (process.env.ENVIRONMENT !== "PRODUCTION")
-      bloodtypeMiddleware(req, res, next);
-    else next();
-  },
-  controller.testBlood
-);
+router.post("/test_blood/:id", authMiddleware, controller.testBlood);
 router.get(
   "/view_donation_list/:id",
   authMiddleware,
