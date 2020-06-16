@@ -8,7 +8,7 @@ const DonationSelectMiddleware = require("../../middlewares/DonationSelectMiddle
 
 const router = express.Router();
 
-router.get("/getpendingOrders", authMiddleware, controller.getPendingOrders);
+router.get("/get_pending_orders", authMiddleware, controller.getPendingOrders);
 
 router.put(
   "/accepted_order/:id",
@@ -25,18 +25,22 @@ router.put(
   authMiddleware,
   controller.rejectOrders
 );
-router.get("/getpendingEvents", authMiddleware, controller.getPendingEvents);
-router.get("/getDonors", authMiddleware, controller.getDonors);
-router.get("/getDonorsDetail/:id", authMiddleware, controller.getDonorsDetail);
-router.get("/getHospitals", authMiddleware, controller.getHospitals);
+router.get("/get_pending_events", authMiddleware, controller.getPendingEvents);
+router.get("/get_donors", authMiddleware, controller.getDonors);
 router.get(
-  "/getHospitalsDetail/:id",
+  "/get_donors_detail/:id",
+  authMiddleware,
+  controller.getDonorsDetail
+);
+router.get("/get_hospitals", authMiddleware, controller.getHospitals);
+router.get(
+  "/get_hospitals_detail/:id",
   authMiddleware,
   controller.getHospitalsDetail
 );
-router.get("/getOrganizers", authMiddleware, controller.getOrganizers);
+router.get("/get_organizers", authMiddleware, controller.getOrganizers);
 router.get(
-  "/getOrganizersDetail/:id",
+  "/get_organizers_detail/:id",
   authMiddleware,
   controller.getOrganizersDetail
 );
@@ -78,17 +82,17 @@ router.get(
   controller.getAcceptedOrders
 );
 router.get(
-  "/getAcceptedOrdersDetail/:id",
+  "/get_accepted_orders_detail/:id",
   authMiddleware,
   controller.getacceptedOrdersDetail
 );
 router.get(
-  "/getAcceptedEventsDetail/:id",
+  "/get_accepted_events_detail/:id",
   authMiddleware,
   controller.getacceptedEventssDetail
 );
 router.get(
-  "/getStoredBloodDonations",
+  "/get_stored_blood_donations",
   authMiddleware,
   controller.getStoredBloodDonation
 );
@@ -111,7 +115,7 @@ router.post(
   controller.bannedAccount
 );
 router.post(
-  "/testBlood/:id",
+  "/test_blood/:id",
   authMiddleware,
   function (req, res, next) {
     if (process.env.ENVIRONMENT !== "PRODUCTION")
@@ -121,7 +125,7 @@ router.post(
   controller.testBlood
 );
 router.get(
-  "/viewDonationList/:id",
+  "/view_donation_list/:id",
   authMiddleware,
   controller.viewDonationList
 );
