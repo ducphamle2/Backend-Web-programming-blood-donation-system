@@ -1118,8 +1118,13 @@ module.exports = {
         });
       } else {
         let sql =
-          "update blood set status = ? where status = ? and blood_id = ?";
-        let values = [constants.rejected, constants.approved, req.params.id];
+          "update blood set status = ?,red_cross_id = ? where status = ? and blood_id = ?";
+        let values = [
+          constants.rejected,
+          req.userData.id,
+          constants.pending,
+          req.params.id,
+        ];
         db.query(sql, values, function (err, result) {
           if (err)
             return res.status(500).json({
