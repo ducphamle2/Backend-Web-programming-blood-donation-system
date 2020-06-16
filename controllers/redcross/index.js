@@ -8,7 +8,7 @@ const DonationSelectMiddleware = require("../../middlewares/DonationSelectMiddle
 
 const router = express.Router();
 
-router.get("/getpendingOrders", authMiddleware, controller.getpendingOrders);
+router.get("/getpendingOrders", authMiddleware, controller.getPendingOrders);
 
 router.put(
   "/accepted_order/:id",
@@ -25,7 +25,7 @@ router.put(
   authMiddleware,
   controller.rejectOrders
 );
-router.get("/getpendingEvents", authMiddleware, controller.getpendingEvents);
+router.get("/getpendingEvents", authMiddleware, controller.getPendingEvents);
 router.get("/getDonors", authMiddleware, controller.getDonors);
 router.get("/getDonorsDetail/:id", authMiddleware, controller.getDonorsDetail);
 router.get("/getHospitals", authMiddleware, controller.getHospitals);
