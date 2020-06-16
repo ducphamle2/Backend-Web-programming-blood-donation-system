@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator/check");
+const {validationResult} = require("express-validator/check");
 
 const db = require("../../database/index");
 const constants = require("../../utils/constants");
@@ -14,10 +14,10 @@ module.exports = {
     login: (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(422).json({ error: errors.array() });
+            return res.status(422).json({error: errors.array()});
         } else {
             if (!utils.checkRole(req.body.role)) {
-                return res.status(400).json({ error: "Wrong role when login" });
+                return res.status(400).json({error: "Wrong role when login"});
             }
             let email = req.body.email;
             let role = req.body.role;
@@ -51,15 +51,15 @@ module.exports = {
                                     role === constants.role.donor
                                         ? user[0].donor_id
                                         : role === constants.role.red_cross
-                                            ? user[0].red_cross_id
-                                            : role === constants.role.organizer
-                                                ? user[0].organizer_id
-                                                : user[0].hospital_id,
+                                        ? user[0].red_cross_id
+                                        : role === constants.role.organizer
+                                            ? user[0].organizer_id
+                                            : user[0].hospital_id,
                                 role: role,
                                 name: user[0].name,
                             },
                             process.env.SECRET_KEY,
-                            { algorithm: "HS512" },
+                            {algorithm: "HS512"},
                             (err, token) => {
                                 if (err) {
                                     return res.status(422).json({
@@ -84,11 +84,11 @@ module.exports = {
     register: (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(422).json({ error: errors.array() });
+            return res.status(422).json({error: errors.array()});
         } else {
             // if it's not among four roles then return error
             if (!utils.checkRole(req.body.role)) {
-                return res.status(400).json({ error: "Wrong role when registering" });
+                return res.status(400).json({error: "Wrong role when registering"});
             }
             // hash the password for protection in case db is exposed
             let password = generateHash(req.body.password);
@@ -138,7 +138,7 @@ module.exports = {
         // VALIDATE TOKEN
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(422).json({ error: errors.array() });
+            return res.status(422).json({error: errors.array()});
         } else {
             db.query(
                 "select * from ?? where email = ?",
@@ -147,13 +147,13 @@ module.exports = {
                     if (err) {
                         return res
                             .status(500)
-                            .json({ error: "there is something wrong with the database" });
+                            .json({error: "there is something wrong with the database"});
                     } else if (result.length === 0) {
-                        return res.status(401).json({ error: "Cannot find correct user" });
+                        return res.status(401).json({error: "Cannot find correct user"});
                     } else {
                         let payload = utils.checkUserId(req.userData.role, result[0]);
                         result[0].role = req.userData.role;
-                        return res.status(200).json({ message: "success", data: payload });
+                        return res.status(200).json({message: "success", data: payload});
                     }
                 }
             );
@@ -164,7 +164,7 @@ module.exports = {
         //CHECK ERROR INPUT
         let errors = validationResult(req);
         if (!errors.isEmpty())
-            return res.status(422).json({ errors: errors.array() });
+            return res.status(422).json({errors: errors.array()});
 
         //LOG USER DATA
         console.log(
@@ -173,8 +173,8 @@ module.exports = {
         );
 
         // check if name has been used or not, since this will be used to query in other api
-        let sql = "select name, email from ?? where name = ? or email = ?";
-        db.query(sql, [req.userData.role, req.body.name, req.body.email], function (
+        let sql = "select * from ?? where email = ?";
+        db.query(sql, [req.userData.role, req.body.email], function (
             err,
             result
         ) {
@@ -186,17 +186,27 @@ module.exports = {
             } else if (result !== undefined) {
                 // IF THE USERNAME OR EMAIL HAS BEEN USED BY ANOTHER USER, RETURN ERROR
                 if (result.length) {
-                    for (let i = 0; i < result.length; i += 1) {
-                        if (
-                            result[i].email === req.userData.email &&
-                            result[i].name === req.userData.name
-                        )
-                            continue;
-                        else
-                            return res.status(409).json({
-                                error: "The name or email has already been used",
-                            });
+                    let roleId = "";
+                    switch (req.userData.role) {
+                        case "donor" :
+                            roleId = "donor_id";
+                            break;
+                        case "organizer":
+                            roleId = "organizer_id";
+                            break;
+                        case "hospital":
+                            roleId = "hospital";
+                            break;
+                        case "red_cross_id":
+                            roleId = "red_cross_id";
+                            break;
                     }
+
+                    if (result[0][roleId] !== req.userData.id)
+                        return res.status(409).json({
+                            error: "The name or email has already been used",
+                        });
+
                 }
 
                 //EVERY THING IS OK, START UPDATE DATA ON THE DB
@@ -216,16 +226,21 @@ module.exports = {
                             "infectious_disease",
                             "cancer"
                         ];
-                        attributeArr.forEach((item) => { if (req.body[item] === 1 || req.body[item] === 0) val[item] = req.body[item] });
+                        attributeArr.forEach((item) => {
+                            if (req.body[item] === 1 || req.body[item] === 0) val[item] = req.body[item]
+                        });
 
                         attributeArr = [
                             "height",
                             "weight",
                             "gender",
                             "address",
-                            "dob"
+                            "dob",
+                            "blood_type"
                         ];
-                        attributeArr.forEach((item) => { if (req.body[item] || req.body[item] === 0) val[item] = req.body[item] });
+                        attributeArr.forEach((item) => {
+                            if (req.body[item] || req.body[item] === 0) val[item] = req.body[item]
+                        });
 
                         //UPDATE SQL
                         db.query(
@@ -283,7 +298,7 @@ module.exports = {
     updatePassword: function (req, res) {
         //CHECK ERROR INPUT
         let errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
+        if (!errors.isEmpty()) return res.status(422).json({errors: errors.array()});
 
         //DATA SENT FROM CLIENT
         let password = req.body.password;
@@ -303,19 +318,19 @@ module.exports = {
                 if (result[0]) {
                     //CHECK VALIDATION OF USER POST DATA
                     let resultPassword = await bcrypt.compare(password, result[0].password);
-                    if (!resultPassword || resultPassword.length === 0) return res.status(401).json({ "password": "Wrong password" });
-                    if (new_password !== confirm_password) return res.status(401).json({ "new_password": "Password does not match" });
+                    if (!resultPassword || resultPassword.length === 0) return res.status(401).json({"password": "Wrong password"});
+                    if (new_password !== confirm_password) return res.status(401).json({"new_password": "Password does not match"});
 
                     //RUN SQL UPDATE
-                    let val = { password: generateHash(new_password) };
+                    let val = {password: generateHash(new_password)};
                     db.query("update ?? set ? where email = ?", [req.userData.role, val, req.userData.email], function (err, result) {
-                        if (err) return res.status(500).json({ error: err, });
-                        else return res.status(200).json({ message: "Update successfully" });
+                        if (err) return res.status(500).json({error: err,});
+                        else return res.status(200).json({message: "Update successfully"});
 
                     });
 
                 } else {
-                    return res.status(426).json({ "error": "unexpected error" });
+                    return res.status(426).json({"error": "unexpected error"});
                 }
             }
         });
