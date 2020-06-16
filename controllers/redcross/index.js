@@ -3,8 +3,6 @@ const express = require("express");
 const controller = require("./redcrossController");
 const authMiddleware = require("../../middlewares/authMiddleware.js");
 const { check } = require("express-validator/check");
-const bloodtypeMiddleware = require("../../middlewares/bloodtypeMiddleware");
-const DonationSelectMiddleware = require("../../middlewares/DonationSelectMiddleware");
 
 const router = express.Router();
 
