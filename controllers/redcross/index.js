@@ -14,10 +14,7 @@ router.put(
   "/accepted_order/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
-  controller.acceptOrders,
-  function (req, res, next) {
-    DonationSelectMiddleware(req, res, next, controller.issueDonation);
-  }
+  controller.acceptOrders
 );
 router.put(
   "/reject_order/:id",
