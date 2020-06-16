@@ -11,7 +11,7 @@ const router = express.Router();
 router.get("/getpendingOrders", authMiddleware, controller.getpendingOrders);
 
 router.put(
-  "/acceptedorder/:id",
+  "/accepted_order/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.acceptOrders,
@@ -20,7 +20,7 @@ router.put(
   }
 );
 router.put(
-  "/rejectorder/:id",
+  "/reject_order/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.rejectOrders
@@ -41,34 +41,42 @@ router.get(
   controller.getOrganizersDetail
 );
 router.put(
-  "/acceptedevent/:id",
+  "/accepted_event/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.acceptEvents
 );
 
 router.put(
-  "/rejectevent/:id",
+  "/reject_event/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.rejectEvents
 );
 router.put(
-  "/rejectdonation/:id",
+  "/reject_donation/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
   controller.rejectDonation
 );
-router.get("/getstore", authMiddleware, controller.getStore);
-router.get("/getbloodDonation", authMiddleware, controller.getbloodDonation);
+router.get("/get_store", authMiddleware, controller.getStore);
+router.get("/get_blood_donation", authMiddleware, controller.getBloodDonation);
 router.get("/get_approved_events", controller.getAllApprovedEvents);
 router.get(
-  "/getUntestedBloodDonation",
+  "/get_untested_blood_donation",
   authMiddleware,
   controller.getUntestedBloodDonation
 );
-router.get("/getAcceptedEvents", authMiddleware, controller.getacceptedEvents);
-router.get("/getAcceptedOrders", authMiddleware, controller.getacceptedOrders);
+router.get(
+  "/get_accepted_events",
+  authMiddleware,
+  controller.getAcceptedEvents
+);
+router.get(
+  "/get_accepted_orders",
+  authMiddleware,
+  controller.getAcceptedOrders
+);
 router.get(
   "/getAcceptedOrdersDetail/:id",
   authMiddleware,
@@ -82,7 +90,7 @@ router.get(
 router.get(
   "/getStoredBloodDonations",
   authMiddleware,
-  controller.getstoredbloodDonation
+  controller.getStoredBloodDonation
 );
 router.post(
   "/store/:id",
