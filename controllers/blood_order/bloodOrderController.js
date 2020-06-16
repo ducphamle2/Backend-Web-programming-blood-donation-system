@@ -175,8 +175,18 @@ module.exports = {
                     error: "Forbidden !! You are not allowed to call this function!"
                 })
             } else {
-                let sql = "select * from blood_order where hospital_id = ? and status = ?"
-                db.query(sql, [req.userData.id, constants.unsent], function (err, result) {
+                let offset = null;
+                let limit = null;
+                console.log("REQ ");
+                if (req.query.offset === "" && req.query.limit === "") {
+                    offset = 0;
+                    limit = 3;
+                } else {
+                    offset = parseInt(req.query.offset);
+                    limit = parseInt(req.query.limit);
+                }
+                let sql = "select * from blood_order where hospital_id = ? and status = ? limit ?, ?"
+                db.query(sql, [req.userData.id, constants.unsent, offset, limit], function (err, result) {
                     if (err) return res.status(500).json({ error: err })
                     return res.status(200).json({ message: "success", data: result })
                 })
@@ -194,8 +204,18 @@ module.exports = {
                     error: "Forbidden !! You are not allowed to call this function!"
                 })
             } else {
-                let sql = "select * from blood_order where hospital_id = ? and status != ?"
-                db.query(sql, [req.userData.id, constants.unsent], function (err, result) {
+                let offset = null;
+                let limit = null;
+                console.log("REQ ");
+                if (req.query.offset === "" && req.query.limit === "") {
+                    offset = 0;
+                    limit = 3;
+                } else {
+                    offset = parseInt(req.query.offset);
+                    limit = parseInt(req.query.limit);
+                }
+                let sql = "select * from blood_order where hospital_id = ? and status != ? limit ?, ?"
+                db.query(sql, [req.userData.id, constants.unsent, offset, limit], function (err, result) {
                     if (err) return res.status(500).json({ error: err })
                     return res.status(200).json({ message: "success", data: result })
                 })
