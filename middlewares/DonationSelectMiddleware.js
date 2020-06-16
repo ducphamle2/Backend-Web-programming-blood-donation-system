@@ -1,11 +1,11 @@
+const db = require("../database/index");
+const constants = require("../utils/constants");
 module.exports = (req, res, next, cb) => {
   try {
     let sql =
       "select blood_id from blood where red_cross_id = ? and donor_id in (select donor_id from donor where blood_type = ?) and status = ? order by donate_date limit ?";
 
     let values = [
-      constants.active,
-      req.params.id,
       req.userData.id,
       req.blood_type,
       constants.stored,
@@ -17,9 +17,15 @@ module.exports = (req, res, next, cb) => {
           err: err,
         });
       else {
-        result.array.forEach((element) => {
-          req.blood_id = element.blood_id;
-          cb(req, res);
+        const resp = [];
+        result.forEach((element) => {
+          const blood_id_params = element.blood_id;
+          const new_result = cb(req, res, blood_id_params);
+          resp.push(new_result);
+        });
+        return res.status(200).json({
+          message: "Accepted Order",
+          data: resp,
         });
       }
     });

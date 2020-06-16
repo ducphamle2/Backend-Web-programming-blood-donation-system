@@ -14,6 +14,7 @@ router.put(
   "/acceptedorder/:id",
   check("id").isLength({ min: 32, max: 32 }),
   authMiddleware,
+  controller.acceptOrders,
   function (req, res, next) {
     DonationSelectMiddleware(req, res, next, controller.issueDonation);
   }
@@ -26,8 +27,19 @@ router.put(
 );
 router.get("/getpendingEvents", authMiddleware, controller.getpendingEvents);
 router.get("/getDonors", authMiddleware, controller.getDonors);
+router.get("/getDonorsDetail/:id", authMiddleware, controller.getDonorsDetail);
 router.get("/getHospitals", authMiddleware, controller.getHospitals);
+router.get(
+  "/getHospitalsDetail/:id",
+  authMiddleware,
+  controller.getHospitalsDetail
+);
 router.get("/getOrganizers", authMiddleware, controller.getOrganizers);
+router.get(
+  "/getOrganizersDetail/:id",
+  authMiddleware,
+  controller.getOrganizersDetail
+);
 router.put(
   "/acceptedevent/:id",
   check("id").isLength({ min: 32, max: 32 }),
@@ -57,6 +69,16 @@ router.get(
 );
 router.get("/getAcceptedEvents", authMiddleware, controller.getacceptedEvents);
 router.get("/getAcceptedOrders", authMiddleware, controller.getacceptedOrders);
+router.get(
+  "/getAcceptedOrdersDetail/:id",
+  authMiddleware,
+  controller.getacceptedOrdersDetail
+);
+router.get(
+  "/getAcceptedEventsDetail/:id",
+  authMiddleware,
+  controller.getacceptedEventssDetail
+);
 router.get(
   "/getStoredBloodDonations",
   authMiddleware,
